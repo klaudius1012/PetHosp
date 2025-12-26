@@ -4,16 +4,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnNovo = document.getElementById("btnNovoAgendamento");
   const modal = document.getElementById("modalAgendamento");
   const btnCancelar = document.getElementById("btnCancelarAgenda");
+  const btnLimpar = document.getElementById("btnLimparAgenda");
   const form = document.getElementById("formAgendamento");
   const busca = document.getElementById("buscaAgenda");
   let idEdicao = null;
 
-  // Carregar dados iniciais
-  carregarAgenda();
-  carregarDatalists();
-
   // Eventos
   if (btnGerar) btnGerar.addEventListener("click", gerarDadosTeste);
+
+  if (btnLimpar) {
+    btnLimpar.addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja limpar toda a agenda?")) {
+        localStorage.removeItem("agenda");
+        carregarAgenda();
+      }
+    });
+  }
 
   if (btnNovo) {
     btnNovo.addEventListener("click", () => {
@@ -44,6 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     busca.addEventListener("input", carregarAgenda);
   }
 
+  // Carregar dados iniciais por último para garantir que eventos funcionem
+  carregarDatalists();
+  carregarAgenda();
+
   // Função para carregar e renderizar a tabela
   function carregarAgenda() {
     const agenda = JSON.parse(localStorage.getItem("agenda")) || [];
@@ -64,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Ordenar por hora
-    filtrados.sort((a, b) => a.hora.localeCompare(b.hora));
+    filtrados.sort((a, b) => (a.hora || "").localeCompare(b.hora || ""));
 
     filtrados.forEach((item) => {
       const tr = document.createElement("tr");

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Atendimento</title>
+    <link rel="stylesheet" href="../CSS/novo-atendimento.css" />
+  </head>
+  <body>
+    <div class="container">
+      <main class="card">
+        <div class="header-actions">
+          <h2>Editar Atendimento</h2>
+          <a href="recepcao.html" class="btn-back">← Voltar</a>
+        </div>
+
+        <form id="formAtendimento">
+          <input type="hidden" id="atendimentoId" />
+          <div class="form-grid">
+            <!-- Seleção de Tutor e Animal -->
+            <div class="form-group">
+              <label for="tutorSelect">Tutor</label>
+              <select id="tutorSelect" required>
+                <option value="">Carregando tutores...</option>
+                <!-- Preenchido via JS -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="animalSelect">Animal</label>
+              <select id="animalSelect" required>
+                <option value="">Selecione um tutor primeiro...</option>
+                <!-- Preenchido via JS -->
+              </select>
+            </div>
+
+            <!-- Dados do Agendamento -->
+            <div class="form-group">
+              <label for="veterinarioSelect">Veterinário</label>
+              <select id="veterinarioSelect" required>
+                <option value="">Selecione...</option>
+                <option value="Dr. Silva">Dr. Silva</option>
+                <option value="Dra. Santos">Dra. Santos</option>
+                <option value="Dr. Oliveira">Dr. Oliveira</option>
+                <option value="Plantão">Plantão</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="dataAtendimento">Data</label>
+              <input type="date" id="dataAtendimento" required />
+            </div>
+
+            <div class="form-group">
+              <label for="horaAtendimento">Hora</label>
+              <input type="time" id="horaAtendimento" required />
+            </div>
+
+            <!-- Triagem -->
+            <div class="form-group">
+              <label for="peso">Peso (kg)</label>
+              <input
+                type="number"
+                id="peso"
+                step="0.1"
+                min="0"
+                placeholder="0.0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="temperatura">Temperatura (°C)</label>
+              <input
+                type="number"
+                id="temperatura"
+                step="0.1"
+                min="30"
+                max="45"
+                placeholder="0.0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="prioridade">Prioridade</label>
+              <select id="prioridade" required>
+                <option value="Rotina">Rotina</option>
+                <option value="Urgência">Urgência</option>
+                <option value="Emergência">Emergência</option>
+              </select>
+            </div>
+
+            <!-- Detalhes Clínicos -->
+            <div class="form-group full-width">
+              <label for="queixa">Queixa Principal</label>
+              <textarea
+                id="queixa"
+                rows="3"
+                placeholder="Descreva o motivo da consulta..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="observacoes">Observações Adicionais</label>
+              <textarea
+                id="observacoes"
+                rows="3"
+                placeholder="Histórico, alergias ou outras observações..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="btn-toolbar">
+            <a href="recepcao.html" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+              Salvar Alterações
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script src="../JS/session-auth.js"></script>
+    <script src="../JS/editar-atendimento.js"></script>
+  </body>
+</html>

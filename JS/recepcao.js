@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  carregarAtendimentos();
-
   // Funcionalidade do Menu Mobile
   const menuBtn = document.getElementById("menuBtn");
   const sidebar = document.querySelector(".sidebar");
@@ -29,6 +27,19 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnGerar) {
     btnGerar.addEventListener("click", gerarDadosTeste);
   }
+
+  // Botão Limpar Dados
+  const btnLimpar = document.getElementById("btnLimparDados");
+  if (btnLimpar) {
+    btnLimpar.addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja limpar todos os atendimentos?")) {
+        localStorage.removeItem("atendimentos");
+        carregarAtendimentos();
+      }
+    });
+  }
+
+  carregarAtendimentos();
 });
 
 function carregarAtendimentos() {
@@ -37,20 +48,14 @@ function carregarAtendimentos() {
 
   const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
 
-  // Data de hoje no formato YYYY-MM-DD para filtro
-  const hoje = new Date();
-  hoje.setMinutes(hoje.getMinutes() - hoje.getTimezoneOffset());
-  const hojeStr = hoje.toISOString().split("T")[0];
-
-  // Filtra: Data de hoje E Status "Aberto" (Aguardando ou Em Atendimento)
+  // Filtra: Status "Aberto" (Aguardando ou Em Atendimento)
   const lista = atendimentos.filter((a) => {
-    const dataAtendimento = a.dataHora ? a.dataHora.split("T")[0] : "";
     const isAberto = ["Aguardando", "Em Atendimento"].includes(a.status);
-    return dataAtendimento === hojeStr && isAberto;
+    return isAberto;
   });
 
   if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-color);">Nenhum atendimento aberto encontrado para hoje.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-message">Nenhum atendimento aberto encontrado.</td></tr>`;
     return;
   }
 
@@ -60,7 +65,7 @@ function carregarAtendimentos() {
       return -1;
     if (a.prioridade !== "Emergência" && b.prioridade === "Emergência")
       return 1;
-    return a.dataHora.localeCompare(b.dataHora);
+    return (a.dataHora || "").localeCompare(b.dataHora || "");
   });
 
   lista.forEach((a) => {
@@ -68,8 +73,7 @@ function carregarAtendimentos() {
 
     // Destaque visual para Emergência
     if (a.prioridade === "Emergência") {
-      tr.style.backgroundColor = "rgba(220, 38, 38, 0.1)"; // Vermelho claro
-      tr.style.borderLeft = "4px solid #dc2626";
+      tr.classList.add("row-emergencia");
     }
 
     const hora = a.dataHora ? a.dataHora.split("T")[1] : "--:--";
@@ -79,16 +83,17 @@ function carregarAtendimentos() {
       <td>${a.tutor}</td>
       <td>${a.animal}</td>
       <td>${a.veterinario || "A definir"}</td>
-      <td style="${
-        a.prioridade === "Emergência"
-          ? "color: #dc2626; font-weight: bold;"
-          : ""
-      }">${a.prioridade}</td>
+      <td class="${a.prioridade === "Emergência" ? "text-emergencia" : ""}">${
+      a.prioridade
+    }</td>
       <td>${a.status}</td>
       <td>
-        <button class="btn-editar" style="padding: 5px 10px; font-size: 0.8rem;" onclick="window.location.href='detalhes-atendimento.html?id=${
+        <button class="btn-editar" onclick="window.location.href='editar-atendimento.html?id=${
           a.id
-        }'">Ver</button>
+        }'">Editar</button>
+        <button class="btn-finalizar" onclick="finalizarAtendimento('${
+          a.id
+        }')">Finalizar</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -133,3 +138,17 @@ function gerarDadosTeste() {
   carregarAtendimentos();
   alert("3 atendimentos de teste gerados para hoje!");
 }
+
+window.finalizarAtendimento = function (id) {
+  if (
+    confirm("Deseja finalizar este atendimento? Ele sairá da lista de abertos.")
+  ) {
+    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
+    const index = atendimentos.findIndex((a) => a.id === id);
+    if (index !== -1) {
+      atendimentos[index].status = "Finalizado";
+      localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
+      carregarAtendimentos();
+    }
+  }
+};

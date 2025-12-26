@@ -1,0 +1,82 @@
+@import url("global.css");
+
+/* =========================================
+   ESTILOS ESPECÍFICOS DA PÁGINA DE AGENDA
+   ========================================= */
+
+/* Personalização da Tabela de Agenda */
+#view-agenda table {
+  border-collapse: separate;
+  border-spacing: 0 0.5rem; /* Separação entre linhas para destaque */
+}
+
+#view-agenda tr {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#view-agenda tr:hover {
+  transform: scale(1.005);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+/* 
+   Classes para colorir as linhas conforme o tipo de atendimento.
+   Estas classes devem ser aplicadas dinamicamente via JavaScript na tag <tr>.
+*/
+
+/* Consulta: Azul */
+tr.tipo-consulta td {
+  background-color: rgba(33, 150, 243, 0.08) !important;
+  border-top: 1px solid rgba(33, 150, 243, 0.2);
+  border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+}
+tr.tipo-consulta td:first-child {
+  border-left: 4px solid #2196f3;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+tr.tipo-consulta td:last-child {
+  border-right: 1px solid rgba(33, 150, 243, 0.2);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Vacina: Verde */
+tr.tipo-vacina td {
+  background-color: rgba(76, 175, 80, 0.08) !important;
+  border-top: 1px solid rgba(76, 175, 80, 0.2);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+}
+tr.tipo-vacina td:first-child {
+  border-left: 4px solid #4caf50;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+tr.tipo-vacina td:last-child {
+  border-right: 1px solid rgba(76, 175, 80, 0.2);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Retorno: Laranja */
+tr.tipo-retorno td {
+  background-color: rgba(255, 152, 0, 0.08) !important;
+  border-top: 1px solid rgba(255, 152, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 152, 0, 0.2);
+}
+tr.tipo-retorno td:first-child {
+  border-left: 4px solid #ff9800;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+tr.tipo-retorno td:last-child {
+  border-right: 1px solid rgba(255, 152, 0, 0.2);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Outros tipos podem seguir o mesmo padrão (Exame: Roxo, Cirurgia: Vermelho, etc.) */
+/* Exame: #9C27B0 */
+/* Cirurgia: #F44336 */

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="../CSS/home.css" />
+    <link rel="stylesheet" href="../CSS/agenda.css" />
+  </head>
+  <body>
+    <main class="login-card card">
+      <!-- Coluna Esquerda: Lista de Serviços -->
+      <aside class="sidebar">
+        <h3>Serviços</h3>
+        <ul id="listaServicos">
+          <li
+            class="active"
+            onclick="window.location.href='home.html'"
+            style="cursor: pointer"
+          >
+            Dashboard
+          </li>
+          <li
+            onclick="window.location.href='agenda.html'"
+            style="cursor: pointer"
+          >
+            Agenda
+          </li>
+          <li
+            onclick="window.location.href='recepcao.html'"
+            style="cursor: pointer"
+          >
+            Recepção
+          </li>
+          <li
+            onclick="window.location.href='tutores.html'"
+            style="cursor: pointer"
+          >
+            Tutores
+          </li>
+          <li
+            onclick="window.location.href='animais.html'"
+            style="cursor: pointer"
+          >
+            Animais
+          </li>
+          <li
+            onclick="window.location.href='atendimento.html'"
+            style="cursor: pointer"
+          >
+            Atendimento
+          </li>
+          <li
+            onclick="window.location.href='vacinas.html'"
+            style="cursor: pointer"
+          >
+            Vacinas
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Coluna Direita: Conteúdo -->
+      <section class="content-area">
+        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
+        <div id="conteudoServico" role="tabpanel">
+          <!-- Módulo: Agenda -->
+          <article id="view-agenda">
+            <h2>Agenda do Dia</h2>
+            <div class="form-group">
+              <input
+                type="search"
+                id="buscaAgenda"
+                placeholder="Buscar por animal ou tutor..."
+              />
+            </div>
+            <button id="btnNovoAgendamento" class="btn btn-primary">
+              Novo Agendamento
+            </button>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tutor</th>
+                  <th>Telefone</th>
+                  <th>Animal</th>
+                  <th>Hora</th>
+                  <th>Espécie</th>
+                  <th>Veterinário</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-agenda">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal de Novo Agendamento -->
+    <div id="modalAgendamento" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2>Novo Agendamento</h2>
+        <form id="formAgendamento">
+          <div class="form-group">
+            <label for="agendaHora">Hora</label>
+            <input type="time" id="agendaHora" required />
+          </div>
+          <div class="form-group">
+            <label for="agendaAnimal">Nome do Animal</label>
+            <input
+              type="text"
+              id="agendaAnimal"
+              list="listaAnimaisAgenda"
+              required
+              placeholder="Ex: Rex"
+            />
+            <datalist id="listaAnimaisAgenda"></datalist>
+          </div>
+          <div class="form-group">
+            <label for="agendaTutor">Nome do Tutor</label>
+            <input
+              type="text"
+              id="agendaTutor"
+              list="listaTutoresAgenda"
+              required
+              placeholder="Ex: Ana Silva"
+            />
+            <datalist id="listaTutoresAgenda"></datalist>
+          </div>
+          <div class="form-group">
+            <label for="agendaVet">Veterinário</label>
+            <input
+              type="text"
+              id="agendaVet"
+              required
+              placeholder="Ex: Dr. João"
+            />
+          </div>
+          <div class="form-group">
+            <label for="agendaTipo">Tipo de Atendimento</label>
+            <select id="agendaTipo" required>
+              <option value="Consulta">Consulta</option>
+              <option value="Vacina">Vacina</option>
+              <option value="Retorno">Retorno</option>
+              <option value="Exame">Exame</option>
+              <option value="Cirurgia">Cirurgia</option>
+            </select>
+          </div>
+          <div class="btn-toolbar">
+            <button
+              type="button"
+              id="btnCancelarAgenda"
+              class="btn btn-secondary"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Botão de Logout -->
+    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
+
+    <!-- JS -->
+    <script src="../JS/session-auth.js"></script>
+    <script src="../JS/agenda.js"></script>
+  </body>
+</html>

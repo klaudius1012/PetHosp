@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Botão de Gerar Tutor de Teste
   document.getElementById("btnGerarTutorTeste")?.addEventListener("click", gerarTutorAleatorio);
+  document.getElementById("btnGerarAgendaTeste")?.addEventListener("click", gerarAgendamentoAleatorio);
 
   // Adicionar botão de Gerar Dados de Teste dinamicamente
   const btnNovoPet = document.getElementById("btnNovoPet");
@@ -94,6 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAnimais();
   });
 
+  // Listeners de Busca e Filtro (Agenda)
+  document.getElementById("buscaAgenda")?.addEventListener("input", renderAgenda);
+  document.getElementById("filtroVetAgenda")?.addEventListener("change", renderAgenda);
+
   // Listeners de Ordenação (Tutores)
   document.querySelectorAll("#view-tutores th.sortable").forEach((th) => {
     th.addEventListener("click", () => {
@@ -130,6 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnNovoAgendamento) {
     btnNovoAgendamento.addEventListener("click", () => {
+      document.getElementById("formAgendamento").reset();
+      document.getElementById("agendaId").value = "";
+      document.querySelector("#modalAgendamento h2").textContent = "Novo Agendamento";
       modalAgenda.classList.remove("hidden");
       carregarOpcoesAgenda();
     });
@@ -139,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnCancelarAgenda.addEventListener("click", () => {
       modalAgenda.classList.add("hidden");
       formAgendamento.reset();
+      document.getElementById("agendaId").value = "";
     });
   }
 
@@ -441,23 +450,32 @@ function carregarOpcoesAgenda() {
 }
 
 function salvarAgendamento() {
+  const id = document.getElementById("agendaId").value;
   const hora = document.getElementById("agendaHora").value;
   const animal = document.getElementById("agendaAnimal").value;
   const tutor = document.getElementById("agendaTutor").value;
   const vet = document.getElementById("agendaVet").value;
   const tipo = document.getElementById("agendaTipo").value;
 
-  const novoAgendamento = {
-    id: "AG" + Date.now(),
-    hora,
-    animal,
-    tutor,
-    veterinario: vet,
-    tipo,
-  };
-
   const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
-  agendamentos.push(novoAgendamento);
+  
+  if (id) {
+    const index = agendamentos.findIndex((a) => a.id === id);
+    if (index !== -1) {
+      agendamentos[index] = { id, hora, animal, tutor, veterinario: vet, tipo };
+    }
+  } else {
+    const novoAgendamento = {
+      id: "AG" + Date.now(),
+      hora,
+      animal,
+      tutor,
+      veterinario: vet,
+      tipo,
+    };
+    agendamentos.push(novoAgendamento);
+  }
+
   agendamentos.sort((a, b) => a.hora.localeCompare(b.hora));
 
   localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
@@ -471,8 +489,17 @@ function renderAgenda() {
   const tbody = document.getElementById("tbody-agenda");
   tbody.innerHTML = "";
   const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+  
+  const termoBusca = document.getElementById("buscaAgenda")?.value.toLowerCase() || "";
+  const filtroVet = document.getElementById("filtroVetAgenda")?.value || "";
 
-  agendamentos.forEach((ag) => {
+  const filtrados = agendamentos.filter((ag) => {
+    const matchBusca = (ag.animal || "").toLowerCase().includes(termoBusca) || (ag.tutor || "").toLowerCase().includes(termoBusca);
+    const matchVet = !filtroVet || ag.veterinario === filtroVet;
+    return matchBusca && matchVet;
+  });
+
+  filtrados.forEach((ag) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${ag.hora}</td>
@@ -481,11 +508,30 @@ function renderAgenda() {
       <td>${ag.veterinario}</td>
       <td>${ag.tipo}</td>
       <td>
+        <button class="btn btn-sm btn-primary" onclick="editarAgendamento('${ag.id}')">Editar</button>
         <button class="btn btn-sm btn-danger" onclick="excluirAgendamento('${ag.id}')">Excluir</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+function editarAgendamento(id) {
+  const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+  const ag = agendamentos.find((a) => a.id === id);
+
+  if (ag) {
+    document.getElementById("agendaId").value = ag.id;
+    document.getElementById("agendaHora").value = ag.hora;
+    document.getElementById("agendaAnimal").value = ag.animal;
+    document.getElementById("agendaTutor").value = ag.tutor;
+    document.getElementById("agendaVet").value = ag.veterinario;
+    document.getElementById("agendaTipo").value = ag.tipo;
+
+    document.querySelector("#modalAgendamento h2").textContent = "Editar Agendamento";
+    carregarOpcoesAgenda();
+    document.getElementById("modalAgendamento").classList.remove("hidden");
+  }
 }
 
 function excluirAgendamento(id) {
@@ -738,4 +784,40 @@ function calcularIdade(dataString) {
   if (hoje.getDate() < nascimento.getDate()) meses--;
   
   return meses > 0 ? `${meses} m${meses > 1 ? "eses" : "ês"}` : "Recém-nascido";
+}
+
+function gerarAgendamentoAleatorio() {
+  const animais = JSON.parse(localStorage.getItem("animais")) || [];
+  
+  if (animais.length === 0) {
+    alert("É necessário ter animais cadastrados para gerar agendamentos de teste.");
+    return;
+  }
+
+  const tipos = ["Consulta", "Vacina", "Retorno", "Exame", "Cirurgia"];
+  const veterinarios = ["Dr. Silva", "Dra. Santos", "Dr. João", "Dra. Maria", "Plantão"];
+  
+  // Seleciona dados aleatórios
+  const animalAleatorio = animais[Math.floor(Math.random() * animais.length)];
+  
+  // Gera hora aleatória entre 08:00 e 18:00
+  const hora = String(Math.floor(Math.random() * (18 - 8 + 1)) + 8).padStart(2, '0');
+  const minuto = String(Math.floor(Math.random() * 4) * 15).padStart(2, '0'); // 00, 15, 30, 45
+
+  const novoAgendamento = {
+    id: "AG" + Date.now(),
+    hora: `${hora}:${minuto}`,
+    animal: animalAleatorio.nome,
+    tutor: animalAleatorio.tutorNome || "Tutor Desconhecido",
+    veterinario: veterinarios[Math.floor(Math.random() * veterinarios.length)],
+    tipo: tipos[Math.floor(Math.random() * tipos.length)],
+  };
+
+  const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+  agendamentos.push(novoAgendamento);
+  agendamentos.sort((a, b) => a.hora.localeCompare(b.hora));
+
+  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+  renderAgenda();
+  alert("Agendamento de teste gerado com sucesso!");
 }

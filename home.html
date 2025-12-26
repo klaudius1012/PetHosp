@@ -43,9 +43,24 @@
                 id="buscaAgenda"
                 placeholder="Buscar por animal ou tutor..."
               />
+              <select id="filtroVetAgenda" style="margin-left: 10px; padding: 5px;">
+                <option value="">Todos os Veterinários</option>
+                <option value="Dr. Silva">Dr. Silva</option>
+                <option value="Dra. Santos">Dra. Santos</option>
+                <option value="Dr. João">Dr. João</option>
+                <option value="Dra. Maria">Dra. Maria</option>
+                <option value="Plantão">Plantão</option>
+              </select>
             </div>
             <button id="btnNovoAgendamento" class="btn btn-primary">
               Novo Agendamento
+            </button>
+            <button
+              id="btnGerarAgendaTeste"
+              class="btn btn-primary"
+              style="margin-left: 10px; background-color: #6c757d"
+            >
+              Gerar Dados de Teste
             </button>
             <table>
               <thead>
@@ -199,6 +214,7 @@
       <div class="modal-content">
         <h2>Novo Agendamento</h2>
         <form id="formAgendamento">
+          <input type="hidden" id="agendaId" />
           <div class="form-group">
             <label for="agendaHora">Hora</label>
             <input type="time" id="agendaHora" required />

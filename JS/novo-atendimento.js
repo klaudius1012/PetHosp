@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputPeso = document.getElementById("peso");
   const inputTemperatura = document.getElementById("temperatura");
   const selectPrioridade = document.getElementById("prioridade");
+  const inputAlergias = document.getElementById("alergias");
   const textQueixa = document.getElementById("queixa");
   const textObservacoes = document.getElementById("observacoes");
 
@@ -107,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       peso: inputPeso.value,
       temperatura: inputTemperatura.value,
       prioridade: selectPrioridade.value,
+      alergias: inputAlergias.value,
       status: "Aguardando",
       queixa: textQueixa.value,
       observacoes: textObservacoes.value,

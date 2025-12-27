@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prescrição</title>
+    <title>Prescrição - PetHosp</title>
     <link rel="stylesheet" href="../CSS/prescricao.css" />
   </head>
 
@@ -13,38 +13,13 @@
       <aside class="sidebar">
         <h3>Serviços</h3>
         <ul id="listaServicos">
-          <li
-            onclick="window.location.href='home.html'"
-            style="cursor: pointer"
-          >
-            Dashboard
-          </li>
-          <li
-            onclick="window.location.href='agenda.html'"
-            style="cursor: pointer"
-          >
-            Agenda
-          </li>
-          <li
-            onclick="window.location.href='recepcao.html'"
-            style="cursor: pointer"
-          >
-            Recepção
-          </li>
-          <li
-            onclick="window.location.href='tutores.html'"
-            style="cursor: pointer"
-          >
-            Tutores
-          </li>
-          <li
-            onclick="window.location.href='animais.html'"
-            style="cursor: pointer"
-          >
-            Animais
-          </li>
-          <li style="cursor: pointer; opacity: 0.5">Atendimento</li>
-          <li style="cursor: pointer; opacity: 0.5">Vacinas</li>
+          <li onclick="window.location.href='home.html'">Dashboard</li>
+          <li onclick="window.location.href='agenda.html'">Agenda</li>
+          <li onclick="window.location.href='recepcao.html'">Recepção</li>
+          <li onclick="window.location.href='tutores.html'">Tutores</li>
+          <li onclick="window.location.href='animais.html'">Animais</li>
+          <li onclick="window.location.href='internacao.html'">Internação</li>
+          <li onclick="window.location.href='vacinas.html'">Vacinas</li>
         </ul>
       </aside>
 
@@ -52,84 +27,55 @@
       <section class="content-area">
         <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
         <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Prescrição -->
           <article id="view-prescricao">
-            <div
-              class="header-actions"
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1rem;
-              "
-            >
-              <h2>Prescrição</h2>
-              <button class="btn btn-secondary" onclick="window.history.back()">
-                Voltar
+            <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
+            <div class="atendimento-header">
+              <div class="header-main">
+                <h2 id="headerAnimalNome" class="animal-highlight">
+                  Nome do Animal
+                </h2>
+                <span id="headerAnimalIdade" class="animal-age">Idade: --</span>
+              </div>
+
+              <div class="header-info-grid">
+                <div class="info-item">
+                  <span class="label">Peso</span>
+                  <span class="value"><span id="headerPeso">--</span> kg</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Temp.</span>
+                  <span class="value"><span id="headerTemp">--</span> °C</span>
+                </div>
+                <div class="info-item alert-item">
+                  <span class="label">Alergias</span>
+                  <span class="value" id="headerAlergias">--</span>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" />
+
+            <h2>Histórico de Prescrições</h2>
+
+            <div class="actions-container">
+              <button
+                class="btn btn-primary"
+                onclick="window.location.href='nova-prescricao.html'"
+              >
+                Nova Prescrição
               </button>
             </div>
 
-            <div
-              class="card-info"
-              style="
-                background: rgba(255, 255, 255, 0.5);
-                padding: 1rem;
-                border-radius: 8px;
-                margin-bottom: 1.5rem;
-              "
-            >
-              <h3>Dados do Paciente</h3>
-              <p>
-                <strong>Tutor:</strong>
-                <span id="tutorNome">Carregando...</span>
-              </p>
-              <p>
-                <strong>Animal:</strong>
-                <span id="animalNome">Carregando...</span>
-              </p>
-              <p>
-                <strong>Veterinário:</strong>
-                <span id="vetNome">Carregando...</span>
-              </p>
-            </div>
-
-            <form id="formPrescricao">
-              <div class="form-group full-width">
-                <label for="receita">Receita / Orientações</label>
-                <textarea
-                  id="receita"
-                  rows="15"
-                  style="
-                    width: 100%;
-                    padding: 10px;
-                    border-radius: 5px;
-                    border: 1px solid #ccc;
-                    margin-top: 0.5rem;
-                  "
-                  placeholder="Digite aqui a prescrição..."
-                ></textarea>
-              </div>
-              <div class="btn-toolbar" style="margin-top: 1rem">
-                <button type="submit" class="btn btn-primary">
-                  Salvar Prescrição
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-neutral"
-                  onclick="window.print()"
-                >
-                  Imprimir
-                </button>
-                <button
-                  type="button"
-                  id="btnFinalizar"
-                  class="btn"
-                  style="background-color: #10b981; color: #000"
-                >
-                  Finalizar
-                </button>
-              </div>
-            </form>
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Medicamentos</th>
+                  <th>Veterinário</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-prescricao"></tbody>
+            </table>
           </article>
         </div>
       </section>
@@ -140,6 +86,7 @@
 
     <!-- JS -->
     <script src="../JS/session-auth.js"></script>
+    <script src="../JS/pagination.js"></script>
     <script src="../JS/prescricao.js"></script>
   </body>
 </html>

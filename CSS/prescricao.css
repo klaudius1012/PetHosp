@@ -16,47 +16,136 @@
   width: 140px;
 }
 
-@media print {
-  /* Ocultar menus, botões e sidebar */
-  .sidebar,
-  #logoutBtn,
-  #menuBtn,
-  .btn-toolbar,
-  .header-actions button {
-    display: none !important;
-  }
+/* =========================================
+   ESTILOS PADRONIZADOS (Tabelas e Layout)
+   ========================================= */
 
-  /* Resetar estilos de layout para impressão em papel */
-  body {
-    background: #fff !important;
-    height: auto;
-    display: block;
-    color: #000 !important;
-  }
+/* --- Ações e Botões --- */
+.actions-container {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
-  .login-card {
-    box-shadow: none !important;
-    border: none !important;
-    background: transparent !important;
-    width: 100% !important;
-    height: auto !important;
-    display: block;
-    backdrop-filter: none !important;
-  }
+/* --- Barra de Busca --- */
+.search-container {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
 
-  .content-area {
-    padding: 0 !important;
-    overflow: visible !important;
-  }
+/* --- Tabela: Estrutura Geral --- */
+.content-area table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
 
-  /* Melhorar visualização dos dados do paciente e textarea */
-  .card-info {
-    background: transparent !important;
-    border: 1px solid #000 !important;
-  }
+.content-area th,
+.content-area td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
 
-  textarea {
-    border: 1px solid #000 !important;
-    resize: none;
-  }
+.content-area th {
+  background: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.content-area td {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-area tr:hover td {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* --- Paginação --- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color, #ccc);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color, #333);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+/* =========================================
+   CABEÇALHO DO PACIENTE (Prescrição)
+   ========================================= */
+.atendimento-header {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.animal-highlight {
+  font-size: 2.2rem;
+  color: #0f766e; /* Verde escuro do tema */
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.animal-age {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.header-info-grid {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.alert-item .value {
+  color: #dc2626;
+  font-weight: bold;
 }

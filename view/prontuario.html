@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="../CSS/tutores.css" />
+    <title>Atendimento</title>
+
+    <link rel="stylesheet" href="../CSS/recepcao.css" />
   </head>
 
   <body>
@@ -18,7 +19,7 @@
           <li onclick="window.location.href='recepcao.html'">Recepção</li>
           <li onclick="window.location.href='tutores.html'">Tutores</li>
           <li onclick="window.location.href='animais.html'">Animais</li>
-          <li onclick="window.location.href='prontuario.html'">Prontuário</li>
+          <li onclick="window.location.href='atendimento.html'">Atendimento</li>
           <li onclick="window.location.href='vacinas.html'">Vacinas</li>
         </ul>
       </aside>
@@ -27,39 +28,39 @@
       <section class="content-area">
         <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
         <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Tutores -->
-          <article id="view-tutores">
-            <h2>Tutores Cadastrados</h2>
-            <div class="form-group">
+          <!-- Módulo: Atendimento -->
+          <article id="view-atendimento">
+            <h2>Histórico de Atendimentos</h2>
+            <div class="actions-container">
+              <button id="btnGerarDados" class="btn btn-neutral btn-space">
+                Gerar Dados
+              </button>
+              <button id="btnLimparDados" class="btn btn-danger btn-space">
+                Limpar
+              </button>
+            </div>
+
+            <div class="form-group search-container">
               <input
                 type="search"
-                id="buscaTutor"
-                placeholder="Buscar por nome ou CPF..."
+                id="buscaAtendimento"
+                placeholder="Buscar por tutor, animal ou veterinário..."
+                class="form-control"
               />
             </div>
-            <button
-              class="btn btn-primary"
-              onclick="window.location.href='cadastro_tutor.html'"
-            >
-              Cadastrar Novo Tutor
-            </button>
-            <button id="btnGerarTutores" class="btn btn-neutral btn-space">
-              Gerar Dados
-            </button>
-            <button id="btnLimparTutores" class="btn btn-danger btn-space">
-              Limpar
-            </button>
+
             <table>
               <thead>
                 <tr>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>Telefone</th>
-                  <th>Cidade</th>
+                  <th>Data/Hora</th>
+                  <th>Tutor</th>
+                  <th>Animal</th>
+                  <th>Veterinário</th>
+                  <th>Status</th>
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="tbody-tutores">
+              <tbody id="tbody-atendimento">
                 <!-- Preenchido via JS -->
               </tbody>
             </table>
@@ -75,6 +76,6 @@
     <!-- JS -->
     <script src="../JS/session-auth.js"></script>
     <script src="../JS/pagination.js"></script>
-    <script src="../JS/tutores.js"></script>
+    <script src="../JS/prontuario.js"></script>
   </body>
 </html>

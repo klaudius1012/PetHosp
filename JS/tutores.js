@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
           cpf: "678.901.234-55",
           telefone: "(61) 94444-5555",
           cidade: "Brasília",
-        }
+        },
       ];
       localStorage.setItem("tutores", JSON.stringify(dadosTeste));
       carregarTutores();
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${t.telefone}</td>
         <td>${t.cidade}</td>
         <td>
-          <button class="btn-icon" onclick="alert('Funcionalidade de edição em desenvolvimento')" title="Editar" style="cursor:pointer; border:none; background:transparent; margin-right: 5px;">✏️</button>
+          <button class="btn-icon" onclick="window.location.href='editar-tutor.html?id=${t.id}'" title="Editar" style="cursor:pointer; border:none; background:transparent; margin-right: 5px;">✏️</button>
           <button class="btn-icon" onclick="excluirTutor('${t.id}')" title="Excluir" style="cursor:pointer; border:none; background:transparent;">🗑️</button>
         </td>
       `;

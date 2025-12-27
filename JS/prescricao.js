@@ -52,8 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (animalCadastro && animalCadastro.nascimento) {
+      // Usa a data do atendimento como referência para o cálculo da idade
+      const dataReferencia = atendimento.dataHora
+        ? new Date(atendimento.dataHora)
+        : new Date();
       elIdade.textContent = `Idade: ${calcularIdade(
-        animalCadastro.nascimento
+        animalCadastro.nascimento,
+        dataReferencia
       )}`;
     } else {
       elIdade.textContent = "Idade: --";
@@ -80,8 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Função auxiliar para calcular idade
-function calcularIdade(dataNasc) {
-  const hoje = new Date();
+function calcularIdade(dataNasc, dataReferencia = new Date()) {
+  const hoje = dataReferencia;
   const nasc = new Date(dataNasc);
   let idade = hoje.getFullYear() - nasc.getFullYear();
   const m = hoje.getMonth() - nasc.getMonth();

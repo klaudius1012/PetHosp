@@ -31,6 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Evento: Clique na tabela (Finalizar Atendimento)
   tbody.addEventListener("click", (e) => {
+    if (e.target && e.target.classList.contains("btn-editar")) {
+      const id = e.target.getAttribute("data-id");
+      const atendimentos =
+        JSON.parse(localStorage.getItem("atendimentos")) || [];
+      const index = atendimentos.findIndex((a) => a.id === id);
+
+      if (index !== -1) {
+        atendimentos[index].status = "Em Atendimento";
+        localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
+        window.location.href = `prescricao.html?id=${id}`;
+      }
+    }
+
     if (e.target && e.target.classList.contains("btn-finalizar")) {
       const id = e.target.getAttribute("data-id");
       if (
@@ -146,9 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="${prioridadeClass}">${a.prioridade || "-"}</td>
         <td>${a.status}</td>
         <td>
-          <button class="btn-editar" onclick="window.location.href='prescricao.html?id=${
-            a.id
-          }'">Prescrever</button>
+          <button class="btn-editar" data-id="${a.id}">Prescrever</button>
           <button class="btn-finalizar" data-id="${a.id}">Finalizar</button>
         </td>
       `;

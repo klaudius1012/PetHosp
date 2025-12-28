@@ -12,14 +12,21 @@ Crie uma validação no formulário para alertar se a temperatura informada indi
 
 Adicione uma coluna "Prioridade" na tabela de Recepção e destaque as linhas com prioridade "Emergência" em vermelho.
 
+Adicione um cabeçalho personalizado com o logotipo e nome da clínica que apareça apenas na impressão da receita.
+
 
 
 Crie uma função para excluir registros das tabelas de Tutores e Animais, com confirmação antes de deletar.
 
 
+Crie a funcionalidade de salvar a prescrição no localStorage vinculando ao atendimento.
+
+Adicione um botão de imprimir na tela de prescrição que gere um PDF simples.
+
+
+
 localStorage.removeItem('tutores') - apaga os dados no local storage
 
 
-reveja funcoes recepcao e parta para atendimento
 
 

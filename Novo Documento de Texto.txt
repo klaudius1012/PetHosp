@@ -1,5 +1,4 @@
-Implemente a funcionalidade de alterar o status do atendimento (ex: de "Aguardando" para "Em Atendimento") na tabela de Recepção.
-
+Crie uma lista pré-definida de medicamentos (datalist) para facilitar o preenchimento do campo "Medicamento".
 
 Preencha a página novo-atendimento.html com um formulário completo para cadastro de atendimento.
 

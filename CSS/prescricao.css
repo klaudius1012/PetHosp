@@ -149,3 +149,15 @@
   color: #dc2626;
   font-weight: bold;
 }
+
+.btn-imprimir {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-imprimir:hover {
+  transform: scale(1.2);
+}

@@ -116,6 +116,137 @@
             </div>
 
             <hr class="divider" />
+
+            <!-- Formulário de Prescrição -->
+            <form id="formPrescricao">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 1rem;
+                "
+              >
+                <h3 style="margin-bottom: 0">Itens da Prescrição</h3>
+                <button
+                  type="button"
+                  id="btnDuplicarUltima"
+                  class="btn btn-secondary"
+                  style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem"
+                >
+                  ↺ Repetir Última
+                </button>
+              </div>
+
+              <div id="containerMedicamentos">
+                <!-- Primeira linha de medicamento -->
+                <div class="medicamento-row">
+                  <div class="form-group" style="flex: 1; min-width: 100px">
+                    <label>Via</label>
+                    <select class="form-control input-via">
+                      <option value="Oral">Oral</option>
+                      <option value="Tópico">Tópico</option>
+                      <option value="Oftálmico">Oftálmico</option>
+                      <option value="Otológico">Otológico</option>
+                      <option value="Subcutâneo">Subcutâneo</option>
+                      <option value="Intramuscular">Intramuscular</option>
+                      <option value="Intravenoso">Intravenoso</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="flex: 3; min-width: 200px">
+                    <label>Medicamento / Conc.</label>
+                    <input
+                      type="text"
+                      class="form-control input-nome"
+                      placeholder="Ex: Amoxicilina 250mg"
+                      required
+                    />
+                  </div>
+                  <div class="form-group" style="flex: 0.5; min-width: 80px">
+                    <label>Dose</label>
+                    <input
+                      type="number"
+                      class="form-control input-dose-qtd"
+                      placeholder="0"
+                      step="any"
+                      required
+                    />
+                  </div>
+                  <div class="form-group" style="flex: 1; min-width: 100px">
+                    <label>Unidade</label>
+                    <select class="form-control input-dose-unidade">
+                      <option value="cp">cp</option>
+                      <option value="ml">ml</option>
+                      <option value="gotas">gotas</option>
+                      <option value="amp">amp</option>
+                      <option value="fr">fr</option>
+                      <option value="mg">mg</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="flex: 2; min-width: 150px">
+                    <label>Frequência</label>
+                    <input
+                      type="text"
+                      class="form-control input-frequencia"
+                      placeholder="Ex: a cada 12h"
+                      required
+                    />
+                  </div>
+                  <div class="form-group" style="flex: 1; min-width: 100px">
+                    <label>Duração</label>
+                    <input
+                      type="text"
+                      class="form-control input-duracao"
+                      placeholder="Ex: 7 dias"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-remove-item"
+                    title="Remover item"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                id="btnAddMedicamento"
+                class="btn btn-neutral"
+                style="margin-bottom: 2rem"
+              >
+                + Adicionar Item
+              </button>
+
+              <div class="form-group full-width">
+                <label for="observacoes"
+                  >Orientações Gerais / Observações</label
+                >
+                <textarea
+                  id="observacoes"
+                  rows="5"
+                  class="form-control"
+                  placeholder="Orientações sobre dieta, retorno, cuidados, etc."
+                ></textarea>
+              </div>
+
+              <div
+                class="btn-toolbar"
+                style="justify-content: flex-end; gap: 1rem; margin-top: 1rem"
+              >
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="window.history.back()"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  Salvar Prescrição
+                </button>
+              </div>
+            </form>
           </article>
         </div>
       </section>

@@ -308,3 +308,45 @@
   color: #dc2626;
   font-weight: bold;
 }
+
+/* =========================================
+   FORMULÁRIO DE PRESCRIÇÃO
+   ========================================= */
+.medicamento-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color, #ddd);
+}
+
+.medicamento-row .form-group {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-control {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #dc2626;
+  padding: 0.5rem;
+  margin-bottom: 2px;
+}
+
+.full-width {
+  width: 100%;
+}

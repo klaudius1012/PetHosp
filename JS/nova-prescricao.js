@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (atendimentoId) {
     carregarDadosCabecalho(atendimentoId);
-    setupSalvar(atendimentoId);
     setupDuplicar(atendimentoId);
   } else {
     console.warn("Nenhum ID de atendimento fornecido.");
@@ -246,74 +245,5 @@ function setupDuplicar(atendimentoId) {
       ultima.itens.forEach((item) => adicionarLinhaMedicamento(item));
       document.getElementById("observacoes").value = ultima.observacoes || "";
     }
-  });
-}
-
-function setupSalvar(atendimentoId) {
-  const form = document.getElementById("formPrescricao");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-    const atendimento = atendimentos.find((a) => a.id === atendimentoId);
-
-    if (!atendimento) {
-      alert("Erro: Atendimento não encontrado.");
-      return;
-    }
-
-    // Coletar itens da prescrição
-    const itens = [];
-    let erroValidacao = false;
-
-    document.querySelectorAll(".medicamento-row").forEach((row) => {
-      if (erroValidacao) return;
-
-      const via = row.querySelector(".input-via").value;
-      const nome = row.querySelector(".input-nome").value;
-      const qtd = row.querySelector(".input-dose-qtd").value;
-      const unidade = row.querySelector(".input-dose-unidade").value;
-      const frequencia = row.querySelector(".input-frequencia").value;
-      const duracao = row.querySelector(".input-duracao").value;
-
-      if (nome.trim() !== "") {
-        if (parseFloat(qtd) <= 0) {
-          alert(`A dose do medicamento "${nome}" deve ser maior que zero.`);
-          erroValidacao = true;
-          return;
-        }
-
-        itens.push({
-          via,
-          nome,
-          posologia: `${qtd} ${unidade} ${frequencia}`,
-          duracao,
-        });
-      }
-    });
-
-    if (erroValidacao) return;
-
-    const observacoes = document.getElementById("observacoes").value;
-
-    const novaPrescricao = {
-      id: Date.now().toString(),
-      atendimentoId: atendimentoId,
-      animal: atendimento.animal,
-      tutor: atendimento.tutor,
-      veterinario: atendimento.veterinario,
-      data: new Date().toISOString(),
-      itens: itens,
-      observacoes: observacoes,
-    };
-
-    const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-    prescricoes.push(novaPrescricao);
-    localStorage.setItem("prescricoes", JSON.stringify(prescricoes));
-
-    alert("Prescrição salva com sucesso!");
-    window.location.href = `prescricao.html?id=${atendimentoId}`;
   });
 }

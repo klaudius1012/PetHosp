@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  carregarCabecalho(atendimentoId); // Função do shared.js
   carregarHistorico(atendimentoId);
   configurarFormulario(atendimentoId);
 });

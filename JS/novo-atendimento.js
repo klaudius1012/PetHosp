@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. Lógica de Dependência Tutor -> Animal
   selectTutor.addEventListener("change", function () {
     const selectedOption = this.options[this.selectedIndex];
-    const tutorId = selectedOption.dataset.id;
+    const tutorId = selectedOption ? selectedOption.dataset.id : null;
 
     // Resetar select de animais
     selectAnimal.innerHTML =
@@ -74,7 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (idade === 0) {
-      let meses = (hoje.getFullYear() - nasc.getFullYear()) * 12 + (hoje.getMonth() - nasc.getMonth());
+      let meses =
+        (hoje.getFullYear() - nasc.getFullYear()) * 12 +
+        (hoje.getMonth() - nasc.getMonth());
       if (hoje.getDate() < nasc.getDate()) meses--;
       return `${meses} meses`;
     }
@@ -107,7 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (animalEncontrado) {
         inputPeso.value = animalEncontrado.peso || "";
         if (animalEncontrado.nascimento) {
-          spanIdade.textContent = `Idade: ${calcularIdade(animalEncontrado.nascimento)}`;
+          spanIdade.textContent = `Idade: ${calcularIdade(
+            animalEncontrado.nascimento
+          )}`;
         }
       }
     }
@@ -153,10 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
+    const selectedTutorOption = selectTutor.options[selectTutor.selectedIndex];
+    const tutorId = selectedTutorOption ? selectedTutorOption.dataset.id : null;
+    const animalObj = animais.find(
+      (a) => a.nome === selectAnimal.value && a.tutorId == tutorId
+    );
+
     const dadosAtendimento = {
       id: "AT" + Date.now(),
       tutor: selectTutor.value,
+      tutorId: tutorId,
       animal: selectAnimal.value,
+      animalId: animalObj ? animalObj.id : null,
       veterinario: selectVeterinario.value,
       dataHora: `${inputData.value}T${inputHora.value}`,
       peso: inputPeso.value,

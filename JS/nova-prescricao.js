@@ -1,150 +1,99 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const atendimentoId = urlParams.get("id");
+  const params = new URLSearchParams(window.location.search);
+  const atendimentoId = params.get("id");
 
-  if (atendimentoId) {
-    carregarCabecalho(atendimentoId); // Função do shared.js
-    setupDuplicar(atendimentoId);
-  } else {
-    console.warn("Nenhum ID de atendimento fornecido.");
+  if (!atendimentoId) {
+    alert("Atendimento não encontrado!");
+    window.location.href = "internacao.html";
+    return;
   }
 
-  setupFormulario();
-});
-
-function setupFormulario() {
+  const container = document.getElementById("medicamentos-container");
   const btnAdd = document.getElementById("btnAddMedicamento");
-  const container = document.getElementById("containerMedicamentos");
+  const form = document.getElementById("formPrescricao");
 
-  // Adicionar nova linha
-  if (btnAdd && container) {
-    btnAdd.addEventListener("click", () => {
-      adicionarLinhaMedicamento();
+  // Função para adicionar linha de medicamento
+  function addMedicamentoRow() {
+    const row = document.createElement("div");
+    row.classList.add("medicamento-row");
+
+    row.innerHTML = `
+      <div class="form-group med-name-group">
+        <label>Medicamento</label>
+        <input type="text" name="nome" class="form-control" required placeholder="Nome do fármaco">
+      </div>
+      <div class="form-group med-info-group">
+        <label>Dose</label>
+        <input type="text" name="dose" class="form-control" placeholder="Ex: 10mg">
+      </div>
+      <div class="form-group med-info-group">
+        <label>Frequência</label>
+        <input type="text" name="frequencia" class="form-control" placeholder="Ex: 8/8h">
+      </div>
+      <div class="form-group med-info-group">
+        <label>Duração</label>
+        <input type="text" name="duracao" class="form-control" placeholder="Ex: 5 dias">
+      </div>
+      <button type="button" class="btn-remove-item" title="Remover">🗑️</button>
+    `;
+
+    // Evento de remover
+    row.querySelector(".btn-remove-item").addEventListener("click", () => {
+      row.remove();
     });
+
+    container.appendChild(row);
   }
 
-  // Remover linha (delegação de evento)
-  if (container) {
-    container.addEventListener("click", (e) => {
-      if (
-        e.target.classList.contains("btn-remove-item") ||
-        e.target.parentElement.classList.contains("btn-remove-item")
-      ) {
-        const btn = e.target.classList.contains("btn-remove-item")
-          ? e.target
-          : e.target.parentElement;
-        const row = btn.closest(".medicamento-row");
-        if (row) row.remove();
+  // Adiciona uma linha inicial
+  addMedicamentoRow();
+
+  // Botão de adicionar
+  btnAdd.addEventListener("click", addMedicamentoRow);
+
+  // Salvar
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const medicamentos = [];
+    const rows = container.querySelectorAll(".medicamento-row");
+
+    rows.forEach((row) => {
+      const nome = row.querySelector('input[name="nome"]').value;
+      const dose = row.querySelector('input[name="dose"]').value;
+      const frequencia = row.querySelector('input[name="frequencia"]').value;
+      const duracao = row.querySelector('input[name="duracao"]').value;
+
+      if (nome) {
+        medicamentos.push({ nome, dose, frequencia, duracao });
       }
     });
-  }
-}
 
-function adicionarLinhaMedicamento(dados = null) {
-  const container = document.getElementById("containerMedicamentos");
-  if (!container) return;
-
-  const row = document.createElement("div");
-  row.className = "medicamento-row";
-  row.innerHTML = `
-    <div class="form-group" style="flex: 1; min-width: 100px;">
-      <label>Via</label>
-      <select class="form-control input-via">
-        <option value="Oral">Oral</option>
-        <option value="Tópico">Tópico</option>
-        <option value="Oftálmico">Oftálmico</option>
-        <option value="Otológico">Otológico</option>
-        <option value="Subcutâneo">Subcutâneo</option>
-        <option value="Intramuscular">Intramuscular</option>
-        <option value="Intravenoso">Intravenoso</option>
-      </select>
-    </div>
-    <div class="form-group" style="flex: 3; min-width: 200px;">
-      <label>Medicamento / Conc.</label>
-      <input type="text" class="form-control input-nome" placeholder="Ex: Amoxicilina 250mg" required>
-    </div>
-    <div class="form-group" style="flex: 0.5; min-width: 80px;">
-      <label>Dose</label>
-      <input type="number" class="form-control input-dose-qtd" placeholder="0" step="any" required>
-    </div>
-    <div class="form-group" style="flex: 1; min-width: 100px;">
-      <label>Unidade</label>
-      <select class="form-control input-dose-unidade">
-        <option value="cp">cp</option>
-        <option value="ml">ml</option>
-        <option value="gotas">gotas</option>
-        <option value="amp">amp</option>
-        <option value="fr">fr</option>
-        <option value="mg">mg</option>
-      </select>
-    </div>
-    <div class="form-group" style="flex: 2; min-width: 150px;">
-      <label>Frequência</label>
-      <input type="text" class="form-control input-frequencia" placeholder="Ex: a cada 12h" required>
-    </div>
-    <div class="form-group" style="flex: 1; min-width: 100px;">
-      <label>Duração</label>
-      <input type="text" class="form-control input-duracao" placeholder="Ex: 7 dias">
-    </div>
-    <button type="button" class="btn-remove-item" title="Remover item">🗑️</button>
-  `;
-
-  container.appendChild(row);
-
-  if (dados) {
-    row.querySelector(".input-via").value = dados.via || "Oral";
-    row.querySelector(".input-nome").value = dados.nome || "";
-    row.querySelector(".input-duracao").value = dados.duracao || "";
-
-    // Tentar parsear a posologia (formato: "QTD UNIDADE FREQUENCIA")
-    if (dados.posologia) {
-      const partes = dados.posologia.split(" ");
-      if (partes.length >= 2) {
-        row.querySelector(".input-dose-qtd").value = partes[0];
-        row.querySelector(".input-dose-unidade").value = partes[1];
-        row.querySelector(".input-frequencia").value = partes
-          .slice(2)
-          .join(" ");
-      } else {
-        // Fallback para dados legados ou mal formatados
-        row.querySelector(".input-frequencia").value = dados.posologia;
-      }
-    }
-  }
-}
-
-function setupDuplicar(atendimentoId) {
-  const btnDuplicar = document.getElementById("btnDuplicarUltima");
-  if (!btnDuplicar) return;
-
-  btnDuplicar.addEventListener("click", () => {
-    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-    const atendimento = atendimentos.find((a) => a.id === atendimentoId);
-    if (!atendimento) return;
-
-    const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-    const historico = prescricoes.filter(
-      (p) => p.animal === atendimento.animal
-    );
-
-    if (historico.length === 0) {
-      alert("Nenhuma prescrição anterior encontrada para este animal.");
+    if (medicamentos.length === 0) {
+      alert("Adicione pelo menos um medicamento.");
       return;
     }
 
-    historico.sort((a, b) => new Date(b.data) - new Date(a.data));
-    const ultima = historico[0];
+    const observacoes = document.getElementById("observacoes").value;
+    const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado")) || {
+      nome: "Veterinário",
+    };
 
-    if (
-      confirm(
-        `Deseja carregar os dados da prescrição de ${new Date(
-          ultima.data
-        ).toLocaleDateString()}?`
-      )
-    ) {
-      document.getElementById("containerMedicamentos").innerHTML = "";
-      ultima.itens.forEach((item) => adicionarLinhaMedicamento(item));
-      document.getElementById("observacoes").value = ultima.observacoes || "";
-    }
+    const novaPrescricao = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+      atendimentoId: atendimentoId,
+      data: new Date().toISOString(),
+      veterinario: usuario.nome,
+      medicamentos: medicamentos,
+      observacoes: observacoes,
+    };
+
+    // Salvar no localStorage
+    const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
+    prescricoes.push(novaPrescricao);
+    localStorage.setItem("prescricoes", JSON.stringify(prescricoes));
+
+    alert("Prescrição salva com sucesso!");
+    window.location.href = `prescricao.html?id=${atendimentoId}`;
   });
-}
+});

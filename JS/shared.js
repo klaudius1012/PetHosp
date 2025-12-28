@@ -1,128 +1,134 @@
-// Funções compartilhadas para carregar cabeçalho e outras utilidades
+document.addEventListener("DOMContentLoaded", () => {
+  carregarDadosCabecalho();
+});
 
-/**
- * Carrega os dados do atendimento e do paciente no cabeçalho padrão.
- * @param {string} atendimentoId O ID do atendimento a ser carregado.
- */
-function carregarCabecalho(atendimentoId) {
-  const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-  const animais = JSON.parse(localStorage.getItem("animais")) || [];
-  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
+function carregarDadosCabecalho() {
+  const header = document.querySelector(".atendimento-header");
+  if (!header) return;
 
-  const atendimento = atendimentos.find((a) => a.id === atendimentoId);
+  const params = new URLSearchParams(window.location.search);
+  const atendimentoId = params.get("id");
 
-  if (!atendimento) {
-    console.error("Atendimento não encontrado para o ID:", atendimentoId);
+  if (!atendimentoId) {
     return;
   }
 
-  // Preencher dados básicos vindos do Atendimento
-  setText("headerTutor", atendimento.tutor);
-  setText("headerPeso", atendimento.peso);
-  setText("headerTemp", atendimento.temperatura);
+  const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
+  const atendimento = atendimentos.find((a) => a.id == atendimentoId);
 
-  // Tratamento de Alergias
-  const elAlergias = document.getElementById("headerAlergias");
-  if (elAlergias) {
-    const alergias = atendimento.alergias || "Nenhuma";
-    elAlergias.textContent = alergias;
-    if (alergias !== "Nenhuma" && alergias.trim() !== "") {
-      elAlergias.style.color = "#dc2626";
-      elAlergias.style.fontWeight = "bold";
-    } else {
-      elAlergias.style.color = "inherit";
-      elAlergias.style.fontWeight = "normal";
-    }
+  if (!atendimento) {
+    console.warn("Atendimento não encontrado.");
+    return;
   }
 
-  // Buscar Tutor (para pegar o telefone)
-  const tutor = tutores.find((t) => t.nome === atendimento.tutor);
-  if (tutor) {
-    setText("headerTelefone", tutor.telefone);
+  const animais = JSON.parse(localStorage.getItem("animais")) || [];
+  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
+
+  // 1. Identificar Tutor (com fallback por nome)
+  let tutor = null;
+  if (atendimento.tutorId) {
+    tutor = tutores.find((t) => t.id == atendimento.tutorId);
+  }
+  if (!tutor && atendimento.tutor) {
+    tutor = tutores.find((t) => t.nome === atendimento.tutor);
   }
 
-  // Buscar Animal (para foto, idade, raça, etc)
+  // 2. Identificar Animal (com fallback por nome e tutor)
   let animal = null;
-  if (tutor) {
-    animal = animais.find(
-      (a) => a.nome === atendimento.animal && a.tutorId == tutor.id
-    );
+  if (atendimento.animalId) {
+    animal = animais.find((a) => a.id == atendimento.animalId);
   }
-  if (!animal) {
-    // Fallback caso o tutorId não bata, busca só pelo nome
-    animal = animais.find((a) => a.nome === atendimento.animal);
+  if (!animal && atendimento.animal) {
+    if (tutor) {
+      animal = animais.find(
+        (a) => a.nome === atendimento.animal && a.tutorId == tutor.id
+      );
+    }
+    if (!animal) {
+      animal = animais.find((a) => a.nome === atendimento.animal);
+    }
   }
 
   if (animal) {
-    setText("headerAnimalNome", animal.nome);
-    setText("headerRaca", animal.raca);
-    setText("headerSexo", animal.sexo);
-    setText("headerPorte", animal.porte);
-    setText("headerReprodutiva", animal.condicaoReprodutiva);
+    setElementText("headerAnimalNome", animal.nome);
+    setElementText("headerRaca", animal.raca);
+    setElementText("headerSexo", animal.sexo);
+    setElementText("headerPorte", animal.porte);
+    setElementText("headerReprodutiva", animal.condicaoReprodutiva);
 
-    // Foto
-    const img = document.getElementById("headerAnimalFoto");
-    const placeholder = document.getElementById("headerAnimalFotoPlaceholder");
-    if (animal.foto) {
-      if (img) {
-        img.src = animal.foto;
-        img.style.display = "block";
-      }
-      if (placeholder) placeholder.style.display = "none";
+    if (animal.nascimento) {
+      setElementText(
+        "headerAnimalIdade",
+        `Idade: ${calcularIdade(animal.nascimento)}`
+      );
     } else {
-      if (img) img.style.display = "none";
-      if (placeholder) placeholder.style.display = "flex";
+      setElementText("headerAnimalIdade", "Idade: --");
     }
 
-    // Idade
-    if (animal.nascimento) {
-      const elIdade = document.getElementById("headerAnimalIdade");
-      if (elIdade) {
-        elIdade.textContent = `Idade: ${calcularIdade(animal.nascimento)}`;
+    const img = document.getElementById("headerAnimalFoto");
+    const placeholder = document.getElementById("headerAnimalFotoPlaceholder");
+    if (img && placeholder) {
+      if (animal.foto) {
+        img.src = animal.foto;
+        img.style.display = "block";
+        placeholder.style.display = "none";
+      } else {
+        img.style.display = "none";
+        placeholder.style.display = "block";
       }
     }
   } else {
-    setText("headerAnimalNome", atendimento.animal);
+    setElementText("headerAnimalNome", atendimento.animal);
+  }
+
+  if (tutor) {
+    setElementText("headerTutor", tutor.nome);
+    setElementText("headerTelefone", tutor.telefone);
+  } else {
+    setElementText("headerTutor", atendimento.tutor);
+  }
+
+  setElementText("headerPeso", atendimento.peso);
+  setElementText("headerTemp", atendimento.temperatura);
+  setElementText("headerQueixa", atendimento.queixa);
+  setElementText("headerAlergias", atendimento.alergias);
+
+  const alergiasEl = document.getElementById("headerAlergias");
+  if (alergiasEl && alergiasEl.parentElement) {
+    const val = (atendimento.alergias || "").toLowerCase();
+    if (val && val !== "não" && val !== "nenhuma" && val !== "--") {
+      alergiasEl.parentElement.classList.add("alert-item");
+    } else {
+      alergiasEl.parentElement.classList.remove("alert-item");
+    }
   }
 }
 
-/**
- * Define o texto de um elemento do DOM.
- * @param {string} elementId O ID do elemento.
- * @param {string} text O texto a ser inserido. Usa '--' se o texto for nulo/vazio.
- */
-function setText(elementId, text) {
+function setElementText(elementId, text) {
   const element = document.getElementById(elementId);
   if (element) {
     element.textContent = text || "--";
   }
 }
 
-/**
- * Calcula a idade com base na data de nascimento.
- * @param {string} dataNasc A data de nascimento no formato YYYY-MM-DD.
- * @returns {string} A idade formatada em anos ou meses.
- */
-function calcularIdade(dataNasc) {
-  if (!dataNasc) return "--";
+function calcularIdade(dataNascimento) {
+  if (!dataNascimento) return "--";
   const hoje = new Date();
-  const nasc = new Date(dataNasc);
-  let idadeAnos = hoje.getFullYear() - nasc.getFullYear();
+  const nasc = new Date(dataNascimento);
+  let idade = hoje.getFullYear() - nasc.getFullYear();
   const m = hoje.getMonth() - nasc.getMonth();
 
   if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
-    idadeAnos--;
+    idade--;
   }
 
-  if (idadeAnos < 1) {
-    let idadeMeses =
+  if (idade === 0) {
+    let meses =
       (hoje.getFullYear() - nasc.getFullYear()) * 12 +
       (hoje.getMonth() - nasc.getMonth());
-    if (hoje.getDate() < nasc.getDate()) {
-      idadeMeses--;
-    }
-    return `${Math.max(0, idadeMeses)} meses`;
+    if (hoje.getDate() < nasc.getDate()) meses--;
+    return `${meses} meses`;
   }
 
-  return `${idadeAnos} anos`;
+  return `${idade} anos`;
 }

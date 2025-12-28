@@ -28,7 +28,7 @@
           <article id="view-afericoes">
             <h2>Aferições (Sinais Vitais)</h2>
             <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
-            <div class="atendimento-header">
+              <div class="atendimento-header">
               <div class="header-main header-row">
                 <div class="avatar-container">
                   <img
@@ -44,9 +44,11 @@
                   >
                 </div>
                 <div class="animal-info-col">
-                  <h2 id="headerAnimalNome" class="animal-highlight">
-                    Nome do Animal
-                  </h2>
+                  <div class="animal-name-row">
+                    <h2 id="headerAnimalNome" class="animal-highlight">
+                      Nome do Animal
+                    </h2>
+                  </div>
                   <span id="headerAnimalIdade" class="animal-age"
                     >Idade: --</span
                   >
@@ -90,6 +92,11 @@
                   <span class="label">Alergias</span>
                   <span class="value" id="headerAlergias">--</span>
                 </div>
+              </div>
+              <br />
+              <div class="queixa-container">
+                <span class="queixa-label">Queixa:</span>
+                <span id="headerQueixa" class="queixa-value">--</span>
               </div>
             </div>
             <p>Módulo em desenvolvimento.</p>

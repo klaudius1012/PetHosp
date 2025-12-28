@@ -27,6 +27,78 @@
         <div id="conteudoServico" role="tabpanel">
           <article id="view-anexos">
             <h2>Anexos e Documentos</h2>
+            <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
+             <div class="atendimento-header">
+              <div class="header-main header-row">
+                <div class="avatar-container">
+                  <img
+                    id="headerAnimalFoto"
+                    src=""
+                    alt="Foto"
+                    class="avatar-img"
+                  />
+                  <span
+                    id="headerAnimalFotoPlaceholder"
+                    class="avatar-placeholder"
+                    >🐾</span
+                  >
+                </div>
+                <div class="animal-info-col">
+                  <div class="animal-name-row">
+                    <h2 id="headerAnimalNome" class="animal-highlight">
+                      Nome do Animal
+                    </h2>
+                  </div>
+                  <span id="headerAnimalIdade" class="animal-age"
+                    >Idade: --</span
+                  >
+                </div>
+              </div>
+
+              <div class="header-info-grid">
+                <div class="info-item">
+                  <span class="label">Tutor</span>
+                  <span class="value" id="headerTutor">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Tel.</span>
+                  <span class="value" id="headerTelefone">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Raça</span>
+                  <span class="value" id="headerRaca">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Sexo</span>
+                  <span class="value" id="headerSexo">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Porte</span>
+                  <span class="value" id="headerPorte">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Reprod.</span>
+                  <span class="value" id="headerReprodutiva">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Peso</span>
+                  <span class="value"><span id="headerPeso">--</span> kg</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Temp.</span>
+                  <span class="value"><span id="headerTemp">--</span> °C</span>
+                </div>
+                <div class="info-item alert-item">
+                  <span class="label">Alergias</span>
+                  <span class="value" id="headerAlergias">--</span>
+                </div>
+              </div>
+              <br />
+              <div class="queixa-container">
+                <span class="queixa-label">Queixa:</span>
+                <span id="headerQueixa" class="queixa-value">--</span>
+              </div>
+            </div>
             <p>Módulo em desenvolvimento.</p>
             <button class="btn btn-secondary" onclick="history.back()">
               Voltar
@@ -39,5 +111,6 @@
     <button id="logoutBtn" class="btn-btn-logout">Sair</button>
 
     <script src="../JS/session-auth.js"></script>
+    <script src="../JS/shared.js"></script>
   </body>
 </html>

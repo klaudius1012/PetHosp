@@ -30,7 +30,7 @@
           <article id="view-nova-prescricao">
             <h2>Nova Prescrição</h2>
             <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
-            <div class="atendimento-header">
+              <div class="atendimento-header">
               <div class="header-main header-row">
                 <div class="avatar-container">
                   <img
@@ -46,9 +46,11 @@
                   >
                 </div>
                 <div class="animal-info-col">
-                  <h2 id="headerAnimalNome" class="animal-highlight">
-                    Nome do Animal
-                  </h2>
+                  <div class="animal-name-row">
+                    <h2 id="headerAnimalNome" class="animal-highlight">
+                      Nome do Animal
+                    </h2>
+                  </div>
                   <span id="headerAnimalIdade" class="animal-age"
                     >Idade: --</span
                   >
@@ -93,11 +95,50 @@
                   <span class="value" id="headerAlergias">--</span>
                 </div>
               </div>
+              <br />
+              <div class="queixa-container">
+                <span class="queixa-label">Queixa:</span>
+                <span id="headerQueixa" class="queixa-value">--</span>
+              </div>
             </div>
 
             <hr class="divider" />
 
-            <!-- Formulário de Prescrição -->
+            <form id="formPrescricao">
+              <div id="medicamentos-container">
+                <!-- Itens adicionados via JS -->
+              </div>
+
+              <button
+                type="button"
+                id="btnAddMedicamento"
+                class="btn btn-secondary btn-add-medicamento"
+              >
+                + Adicionar Medicamento
+              </button>
+
+              <div class="form-group full-width">
+                <label for="observacoes">Observações / Recomendações</label>
+                <textarea
+                  id="observacoes"
+                  rows="4"
+                  class="form-control"
+                ></textarea>
+              </div>
+
+              <div class="form-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="history.back()"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  Salvar Prescrição
+                </button>
+              </div>
+            </form>
           </article>
         </div>
       </section>

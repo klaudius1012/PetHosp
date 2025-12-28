@@ -46,15 +46,20 @@
                   >
                 </div>
                 <div class="animal-info-col">
-                  <h2 id="headerAnimalNome" class="animal-highlight">
-                    Nome do Animal
-                  </h2>
+                  <div class="animal-name-row">
+                    <h2 id="headerAnimalNome" class="animal-highlight">
+                      Nome do Animal
+                    </h2>
+                  </div>
                   <span id="headerAnimalIdade" class="animal-age"
                     >Idade: --</span
                   >
                 </div>
               </div>
-
+              <div class="queixa-container">
+                <span class="queixa-label">Queixa:</span>
+                <span id="headerQueixa" class="queixa-value">--</span>
+              </div>
               <div class="header-info-grid">
                 <div class="info-item">
                   <span class="label">Tutor</span>
@@ -102,7 +107,7 @@
             <div class="actions-container">
               <button
                 class="btn btn-primary"
-                onclick="window.location.href='nova-prescricao.html'"
+                onclick="window.location.href='nova-prescricao.html' + window.location.search"
               >
                 Nova Prescrição
               </button>

@@ -70,3 +70,25 @@
 .full-width {
   width: 100%;
 }
+
+/* Botões e Toolbar */
+.btn-add-medicamento {
+  margin-bottom: 1.5rem;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* Estilos para linhas de medicamentos (JS) */
+.med-name-group {
+  flex: 2;
+  min-width: 200px;
+}
+
+.med-info-group {
+  flex: 1;
+  min-width: 100px;
+}

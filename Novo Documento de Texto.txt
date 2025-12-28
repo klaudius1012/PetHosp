@@ -1,4 +1,4 @@
-Crie uma lista pré-definida de medicamentos (datalist) para facilitar o preenchimento do campo "Medicamento".
+
 
 Preencha a página novo-atendimento.html com um formulário completo para cadastro de atendimento.
 
@@ -21,6 +21,15 @@ Crie uma função para excluir registros das tabelas de Tutores e Animais, com c
 Crie a funcionalidade de salvar a prescrição no localStorage vinculando ao atendimento.
 
 Adicione um botão de imprimir na tela de prescrição que gere um PDF simples.
+
+
+
+Crie uma lista pré-definida de medicamentos (datalist) para facilitar o preenchimento do campo "Medicamento".
+
+Crie uma lista pré-definida de medicamentos (datalist) para facilitar o preenchimento do campo "Medicamento".
+
+
+Crie uma página de dashboard que mostre gráficos simples sobre os atendimentos (ex: atendimentos por dia, tipos de animais).
 
 
 

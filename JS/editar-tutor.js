@@ -1,9 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formCadastro");
-
-  // Pegar o ID da URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
+document.addEventListener("DOMContentLoaded", function () {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
   if (!id) {
     alert("Tutor não identificado.");
@@ -11,9 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Carregar dados do localStorage
-  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
-  const tutor = tutores.find((t) => t.id === id);
+  let tutores = JSON.parse(localStorage.getItem("tutores")) || [];
+  let tutorIndex = tutores.findIndex((t) => t.id === id);
+  let tutor = tutores[tutorIndex];
 
   if (!tutor) {
     alert("Tutor não encontrado.");
@@ -21,38 +18,35 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Preencher o formulário com os dados existentes
-  document.getElementById("nome").value = tutor.nome || "";
-  document.getElementById("cpf").value = tutor.cpf || "";
-  document.getElementById("nascimento").value = tutor.nascimento || "";
-  document.getElementById("telefone").value = tutor.telefone || "";
-  document.getElementById("endereco").value = tutor.endereco || "";
-  document.getElementById("bairro").value = tutor.bairro || "";
-  document.getElementById("cidade").value = tutor.cidade || "";
+  // Preencher campos
+  document.getElementById("nome").value = tutor.nome;
+  document.getElementById("cpf").value = tutor.cpf;
+  document.getElementById("nascimento").value = tutor.nascimento;
+  document.getElementById("telefone").value = tutor.telefone;
+  if (tutor.telefone2) {
+    document.getElementById("telefone2").value = tutor.telefone2;
+  }
+  document.getElementById("endereco").value = tutor.endereco;
+  document.getElementById("bairro").value = tutor.bairro;
+  document.getElementById("cidade").value = tutor.cidade;
 
-  // Evento de Salvar
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  const form = document.getElementById("formCadastro");
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-    // Atualizar objeto do tutor (mantendo o ID original)
     tutor.nome = document.getElementById("nome").value;
     tutor.cpf = document.getElementById("cpf").value;
     tutor.nascimento = document.getElementById("nascimento").value;
     tutor.telefone = document.getElementById("telefone").value;
+    tutor.telefone2 = document.getElementById("telefone2").value;
     tutor.endereco = document.getElementById("endereco").value;
     tutor.bairro = document.getElementById("bairro").value;
     tutor.cidade = document.getElementById("cidade").value;
 
-    // Encontrar índice e atualizar no array
-    const index = tutores.findIndex((t) => t.id === id);
-    if (index !== -1) {
-      tutores[index] = tutor;
-      localStorage.setItem("tutores", JSON.stringify(tutores));
+    tutores[tutorIndex] = tutor;
+    localStorage.setItem("tutores", JSON.stringify(tutores));
 
-      alert("Dados do tutor atualizados com sucesso!");
-      window.location.href = "tutores.html";
-    } else {
-      alert("Erro ao salvar: Tutor não encontrado na lista.");
-    }
+    alert("Tutor atualizado com sucesso!");
+    window.location.href = "tutores.html";
   });
 });

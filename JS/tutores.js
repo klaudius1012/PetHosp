@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
           cpf: "123.456.789-00",
           telefone: "(11) 99999-0000",
           cidade: "São Paulo",
+        
         },
         {
           id: Date.now() + "2",

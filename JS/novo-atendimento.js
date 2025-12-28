@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     selectAnimal.innerHTML =
       '<option value="">Selecione um tutor primeiro...</option>';
     selectAnimal.disabled = true;
+    inputPeso.value = "";
+    const spanIdade = document.getElementById("spanIdadeAnimal");
+    if (spanIdade) spanIdade.textContent = "";
 
     if (tutorId) {
       // Filtrar animais deste tutor
@@ -55,6 +58,57 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         selectAnimal.innerHTML =
           '<option value="">Nenhum animal encontrado</option>';
+      }
+    }
+  });
+
+  // Função auxiliar para calcular idade
+  function calcularIdade(dataNasc) {
+    const hoje = new Date();
+    const nasc = new Date(dataNasc);
+    let idade = hoje.getFullYear() - nasc.getFullYear();
+    const m = hoje.getMonth() - nasc.getMonth();
+
+    if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
+      idade--;
+    }
+
+    if (idade === 0) {
+      let meses = (hoje.getFullYear() - nasc.getFullYear()) * 12 + (hoje.getMonth() - nasc.getMonth());
+      if (hoje.getDate() < nasc.getDate()) meses--;
+      return `${meses} meses`;
+    }
+
+    return `${idade} anos`;
+  }
+
+  // Carregar dados do animal (Peso) ao selecionar
+  selectAnimal.addEventListener("change", function () {
+    const nomeAnimal = this.value;
+    const selectedTutorOption = selectTutor.options[selectTutor.selectedIndex];
+    const tutorId = selectedTutorOption ? selectedTutorOption.dataset.id : null;
+
+    // Elemento para exibir a idade (cria se não existir)
+    let spanIdade = document.getElementById("spanIdadeAnimal");
+    if (!spanIdade) {
+      spanIdade = document.createElement("span");
+      spanIdade.id = "spanIdadeAnimal";
+      spanIdade.style.marginLeft = "10px";
+      spanIdade.style.color = "#555";
+      spanIdade.style.fontSize = "0.9rem";
+      this.parentNode.appendChild(spanIdade);
+    }
+    spanIdade.textContent = "";
+
+    if (nomeAnimal && tutorId) {
+      const animalEncontrado = animais.find(
+        (a) => a.nome === nomeAnimal && a.tutorId == tutorId
+      );
+      if (animalEncontrado) {
+        inputPeso.value = animalEncontrado.peso || "";
+        if (animalEncontrado.nascimento) {
+          spanIdade.textContent = `Idade: ${calcularIdade(animalEncontrado.nascimento)}`;
+        }
       }
     }
   });

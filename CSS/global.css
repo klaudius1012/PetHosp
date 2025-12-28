@@ -104,6 +104,40 @@ body {
   background-color: #4b5563;
 }
 
+/* --- Botões de Ação Padronizados --- */
+.btn-editar {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-excluir,
+.btn-danger {
+  background-color: var(--error-color);
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-excluir:hover,
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-finalizar {
+  background-color: #10b981; /* Verde Esmeralda */
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
 /* --- Formulários e Inputs --- */
 .form-group {
   margin-bottom: 1.25rem;
@@ -210,6 +244,101 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* --- Cabeçalho do Paciente --- */
+.atendimento-header {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.avatar-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #ddd;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.avatar-placeholder {
+  font-size: 2rem;
+  color: #ccc;
+}
+
+.animal-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.animal-highlight {
+  font-size: 2.2rem;
+  color: #0f766e;
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.animal-age {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.header-info-grid {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-item .label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.info-item .value {
+  font-weight: bold;
+  color: #0f766e;
+}
+
+.alert-item .value {
+  color: #dc2626;
+  font-weight: bold;
+}
+
 
 /* ==========================================================================
    LAYOUT PRINCIPAL (SIDEBAR + CONTEÚDO)
@@ -324,3 +453,101 @@ button:disabled {
   }
 }
 
+/* ============================= */
+/* TABELAS (Estilos Globais)     */
+/* ============================= */
+
+.content-area table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.content-area th,
+.content-area td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.content-area th {
+  background: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.content-area td {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-area tr:hover td {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* ============================= */
+/* PAGINAÇÃO (Estilos Globais)   */
+/* ============================= */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color, #ccc);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color, #333);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+/* ============================= */
+/* MODAL (Estilos Globais)       */
+/* ============================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}

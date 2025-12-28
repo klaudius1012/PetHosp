@@ -20,66 +20,22 @@
         </div>
 
         <form id="formPet">
-          <div
-            class="form-group"
-            style="
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              margin-bottom: 1.5rem;
-            "
-          >
-            <div
-              style="
-                width: 120px;
-                height: 120px;
-                border-radius: 50%;
-                overflow: hidden;
-                background-color: #f0f0f0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border: 2px solid #ddd;
-              "
-            >
+          <div class="form-group photo-upload-group">
+            <div class="photo-preview-container">
               <img
                 id="foto-preview"
                 src=""
                 alt="Foto"
-                style="
-                  width: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                  display: none;
-                "
+                class="photo-preview-img"
               />
-              <span id="foto-placeholder" style="font-size: 2.5rem; color: #ccc"
-                >📷</span
-              >
+              <span id="foto-placeholder" class="photo-placeholder">📷</span>
             </div>
-            <div style="display: flex; gap: 1rem; margin-top: 0.5rem">
-              <label
-                for="foto"
-                style="
-                  cursor: pointer;
-                  color: #0f766e;
-                  font-size: 0.9rem;
-                  text-decoration: underline;
-                "
-                >Alterar foto</label
-              >
+            <div class="photo-actions">
+              <label for="foto" class="photo-label">Alterar foto</label>
               <button
                 type="button"
                 id="btnRemoverFoto"
-                style="
-                  border: none;
-                  background: none;
-                  color: #dc2626;
-                  font-size: 0.9rem;
-                  text-decoration: underline;
-                  cursor: pointer;
-                  display: none;
-                "
+                class="btn-remove-photo"
               >
                 Remover foto
               </button>

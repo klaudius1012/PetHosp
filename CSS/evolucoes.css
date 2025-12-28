@@ -1,43 +1,10 @@
 @import url("global.css");
 
-.btn {
-  width: 140px;
-}
-
 /* =========================================
-   ESTILOS PADRONIZADOS (Tabelas e Layout)
+   ESTILOS ESPECÍFICOS DE EVOLUÇÕES
    ========================================= */
 
-/* --- Ações e Botões --- */
-.actions-container {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* --- Barra de Busca --- */
-.search-container {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-/* =========================================
-   CABEÇALHO DO PACIENTE (Prescrição)
-   ========================================= */
-.btn-imprimir {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.btn-imprimir:hover {
-  transform: scale(1.2);
-}
-
-/* Estilos de Formulário e Cards (Exames/Evoluções) */
+/* --- Formulário --- */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -69,6 +36,7 @@
   font-family: inherit;
 }
 
+/* --- Lista de Evoluções (Cards) --- */
 .historico-list {
   margin-top: 1rem;
   display: flex;
@@ -76,7 +44,7 @@
   gap: 1rem;
 }
 
-.exame-card {
+.evolucao-card {
   background: #f9f9f9;
   padding: 1rem;
   border-left: 4px solid #0f766e;
@@ -84,7 +52,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.exame-header {
+.evolucao-header {
   display: flex;
   justify-content: space-between;
   font-weight: bold;
@@ -94,12 +62,13 @@
   padding-bottom: 0.5rem;
 }
 
-.exame-desc {
+.evolucao-desc {
   white-space: pre-wrap;
   color: #333;
   line-height: 1.5;
 }
 
+/* --- Utilitários --- */
 .divider-spacing {
   margin: 2rem 0;
 }

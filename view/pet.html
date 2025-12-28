@@ -21,13 +21,23 @@
         </div>
 
         <form id="formPet">
-          <div class="form-group" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 1.5rem;">
-            <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; border: 2px solid #ddd;">
-              <img id="foto-preview" src="" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-              <span id="foto-placeholder" style="font-size: 2.5rem; color: #ccc;">📷</span>
+          <div class="form-group photo-upload-group">
+            <div class="photo-preview-container">
+              <img
+                id="foto-preview"
+                src=""
+                alt="Foto"
+                class="photo-preview-img"
+              />
+              <span id="foto-placeholder" class="photo-placeholder">📷</span>
             </div>
-            <label for="foto" style="margin-top: 0.5rem; cursor: pointer; color: #0f766e; font-size: 0.9rem; text-decoration: underline;">Alterar foto</label>
-            <input type="file" id="foto" accept="image/*" style="display: none;">
+            <label for="foto" class="photo-label">Alterar foto</label>
+            <input
+              type="file"
+              id="foto"
+              accept="image/*"
+              style="display: none"
+            />
           </div>
 
           <div class="form-group">
@@ -75,7 +85,10 @@
           <div class="form-group">
             <label for="nascimento">Data de Nascimento (aproximada)</label>
             <input type="date" id="nascimento" />
-            <span id="idade-calculada" style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;"></span>
+            <span
+              id="idade-calculada"
+              style="font-size: 0.9rem; color: #666; margin-top: 0.25rem"
+            ></span>
           </div>
 
           <div class="form-group">

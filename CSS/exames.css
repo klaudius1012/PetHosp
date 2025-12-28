@@ -1,43 +1,12 @@
 @import url("global.css");
 
-.btn {
-  width: 140px;
-}
-
 /* =========================================
-   ESTILOS PADRONIZADOS (Tabelas e Layout)
+   ESTILOS ESPECÍFICOS DE EXAMES
    ========================================= */
 
-/* --- Ações e Botões --- */
-.actions-container {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
 
-/* --- Barra de Busca --- */
-.search-container {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-}
 
-/* =========================================
-   CABEÇALHO DO PACIENTE (Prescrição)
-   ========================================= */
-.btn-imprimir {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.btn-imprimir:hover {
-  transform: scale(1.2);
-}
-
-/* Estilos de Formulário e Cards (Exames/Evoluções) */
+/* --- Formulário de Solicitação --- */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -69,6 +38,7 @@
   font-family: inherit;
 }
 
+/* --- Lista de Exames (Cards) --- */
 .historico-list {
   margin-top: 1rem;
   display: flex;
@@ -100,6 +70,7 @@
   line-height: 1.5;
 }
 
+/* --- Utilitários --- */
 .divider-spacing {
   margin: 2rem 0;
 }

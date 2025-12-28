@@ -8,34 +8,6 @@
 /* TABELA - AGENDA               */
 /* ============================= */
 
-.content-area table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 0.95rem;
-}
-
-.content-area th,
-.content-area td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-}
-
-.content-area th {
-  background: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
-  border-bottom: 2px solid var(--border-color);
-}
-
-.content-area td {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.content-area tr:hover td {
-  background: rgba(255, 255, 255, 0.45);
-}
-
 /* Alinhamentos específicos */
 .content-area th:nth-child(1),
 .content-area td:nth-child(1) {
@@ -65,89 +37,16 @@
   z-index: 1;
 }
 
-/* --- Paginação --- */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding: 1rem;
-}
-
-.pagination button {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border-color, #ccc);
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  color: var(--text-color, #333);
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination span {
-  font-weight: 600;
-  color: var(--text-color, #333);
-}
-
 /* --- Botões e Utilitários --- */
 .btn-space {
   margin-left: 10px;
 }
 
-.btn{
-  width: 120px ;
+.btn {
+  width: 120px;
 }
 .btn-primary {
   width: 150px;
-}
-
-.btn-danger {
-  background-color: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #dc2626;
-}
-
-/* ============================= */
-/* MODAL                         */
-/* ============================= */
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 #agendaTipo {

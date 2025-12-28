@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Procedimentos - PetHosp</title>
-    <link rel="stylesheet" href="../CSS/prescricao.css" />
+    <link rel="stylesheet" href="../CSS/procedimentos.css" />
   </head>
 
   <body>
@@ -29,42 +29,21 @@
             <h2>Procedimentos</h2>
             <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
             <div class="atendimento-header">
-              <div
-                class="header-main"
-                style="flex-direction: row; align-items: center; gap: 1rem"
-              >
-                <div
-                  style="
-                    width: 80px;
-                    height: 80px;
-                    border-radius: 50%;
-                    overflow: hidden;
-                    background-color: #f0f0f0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border: 2px solid #ddd;
-                    flex-shrink: 0;
-                  "
-                >
+              <div class="header-main header-row">
+                <div class="avatar-container">
                   <img
                     id="headerAnimalFoto"
                     src=""
                     alt="Foto"
-                    style="
-                      width: 100%;
-                      height: 100%;
-                      object-fit: cover;
-                      display: none;
-                    "
+                    class="avatar-img"
                   />
                   <span
                     id="headerAnimalFotoPlaceholder"
-                    style="font-size: 2rem; color: #ccc"
+                    class="avatar-placeholder"
                     >🐾</span
                   >
                 </div>
-                <div style="display: flex; flex-direction: column">
+                <div class="animal-info-col">
                   <h2 id="headerAnimalNome" class="animal-highlight">
                     Nome do Animal
                   </h2>

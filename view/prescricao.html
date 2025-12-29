@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prescrição - PetHosp</title>
+    <title>Histórico de Prescrições - PetHosp</title>
     <link rel="stylesheet" href="../CSS/prescricao.css" />
   </head>
-
   <body>
-    <main class="login-card card">
-      <!-- Coluna Esquerda: Lista de Serviços -->
+    <main class="login-card card no-print">
       <aside class="sidebar">
         <h3>Serviços</h3>
         <ul id="listaServicos">
@@ -23,14 +21,12 @@
         </ul>
       </aside>
 
-      <!-- Coluna Direita: Conteúdo -->
       <section class="content-area">
         <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
-        <div id="conteudoServico" role="tabpanel">
-          <article id="view-prescricao">
-            <h2>Prescrição</h2>
-            <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
-            <div class="atendimento-header">
+        <div id="conteudoServico">
+          <article>
+            <h2>Histórico de Prescrições</h2>
+             <div class="atendimento-header">
               <div class="header-main header-row">
                 <div class="avatar-container">
                   <img
@@ -99,53 +95,19 @@
                 </div>
               </div>
             </div>
-
-            <hr class="divider" />
-
-            <h2>Histórico de Prescrições</h2>
-
+            
             <div class="actions-container">
               <button
                 class="btn btn-primary"
-                onclick="window.location.href='nova-prescricao.html' + window.location.search"
+                onclick="window.location.href='nova-prescricao.html'"
               >
                 Nova Prescrição
               </button>
               <button
                 class="btn btn-secondary"
-                onclick="window.location.href='evolucoes.html' + window.location.search"
+                onclick="window.location.href='internacao.html'"
               >
-                📈 Evoluções
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="window.location.href='exames.html' + window.location.search"
-              >
-                🔬 Exames
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="window.location.href='procedimentos.html' + window.location.search"
-              >
-                🩺 Procedimentos
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="window.location.href='afericoes.html' + window.location.search"
-              >
-                🌡️ Aferições
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="window.location.href='cirurgias.html' + window.location.search"
-              >
-                ✂️ Cirurgias
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="window.location.href='anexos.html' + window.location.search"
-              >
-                📎 Anexo
+                Voltar para Internação
               </button>
             </div>
 
@@ -153,25 +115,77 @@
               <thead>
                 <tr>
                   <th>Data</th>
-                  <th>Medicamentos</th>
+                  <th>Resumo</th>
                   <th>Veterinário</th>
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="tbody-prescricao"></tbody>
+              <tbody id="tbody-prescricao">
+                <!-- Preenchido via JS -->
+              </tbody>
             </table>
           </article>
         </div>
       </section>
     </main>
 
-    <!-- Botão de Logout -->
-    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
+    <!-- Área de Impressão (Oculta na tela, visível na impressão) -->
+    <div id="print-section">
+      <div class="print-header">
+        <div class="print-brand">
+          <img
+            src="../img/logo.png"
+            alt="Logo"
+            onerror="this.style.display='none'"
+          />
+          <h1>PetClin</h1>
+        </div>
+        <div class="print-contact-info">
+          <strong>Clínica Veterinária</strong><br />
+          Rua Exemplo, 123 - Centro<br />
+          (11) 99999-9999 | contato@petclin.com
+        </div>
+      </div>
 
-    <!-- JS -->
+      <div class="print-info-grid">
+        <div><strong>Veterinário:</strong> <span id="print-vet"></span></div>
+        <div><strong>Data:</strong> <span id="print-data"></span></div>
+        <div><strong>Tutor:</strong> <span id="print-tutor"></span></div>
+        <div><strong>Paciente:</strong> <span id="print-animal"></span></div>
+      </div>
+
+      <h3>Prescrição Médica</h3>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Medicamento</th>
+            <th>Dose</th>
+            <th>Intervalo</th>
+          </tr>
+        </thead>
+        <tbody id="print-medicamentos-tbody">
+          <!-- Preenchido via JS -->
+        </tbody>
+      </table>
+
+      <!-- Seções Extras (Evoluções, Exames, etc.) -->
+      <div id="print-extras"></div>
+
+      <div id="print-obs-container" class="print-obs" style="display: none">
+        <strong>Observações:</strong><br />
+        <span id="print-obs-text"></span>
+      </div>
+
+      <div class="print-footer">
+        <div class="print-assinatura">Assinatura do Veterinário</div>
+        <p>Impresso em <span id="print-data-impressao"></span></p>
+      </div>
+    </div>
+
+    <button id="logoutBtn" class="btn-btn-logout no-print">Sair</button>
+
     <script src="../JS/session-auth.js"></script>
     <script src="../JS/shared.js"></script>
-    <script src="../JS/pagination.js"></script>
     <script src="../JS/prescricao.js"></script>
   </body>
 </html>

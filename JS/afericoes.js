@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  let chartInstance = null;
   const params = new URLSearchParams(window.location.search);
   const atendimentoId = params.get("id");
 
@@ -76,6 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return dtB - dtA;
     });
 
+    atualizarGrafico(lista);
+
     if (listaContainer) {
       listaContainer.innerHTML = "";
 
@@ -122,6 +125,73 @@ document.addEventListener("DOMContentLoaded", () => {
         listaContainer.appendChild(card);
       });
     }
+  }
+
+  function atualizarGrafico(lista) {
+    const ctx = document.getElementById("graficoAfericoes");
+    if (!ctx) return;
+
+    // Ordenar cronologicamente (mais antigo para mais recente) para o gráfico
+    const dadosOrdenados = [...lista].sort((a, b) => {
+      const dtA = new Date(`${a.data}T${a.hora}`);
+      const dtB = new Date(`${b.data}T${b.hora}`);
+      return dtA - dtB;
+    });
+
+    const labels = dadosOrdenados.map((a) => {
+      const data = new Date(a.data).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' });
+      return `${data} ${a.hora}`;
+    });
+
+    const dataTemp = dadosOrdenados.map((a) => a.temperatura || null);
+    const dataFC = dadosOrdenados.map((a) => a.fc || null);
+    const dataFR = dadosOrdenados.map((a) => a.fr || null);
+
+    if (chartInstance) {
+      chartInstance.destroy();
+    }
+
+    chartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Temp (°C)",
+            data: dataTemp,
+            borderColor: "#ef4444", // Vermelho
+            backgroundColor: "#ef4444",
+            yAxisID: "y",
+            tension: 0.2,
+          },
+          {
+            label: "FC (bpm)",
+            data: dataFC,
+            borderColor: "#3b82f6", // Azul
+            backgroundColor: "#3b82f6",
+            yAxisID: "y1",
+            tension: 0.2,
+          },
+          {
+            label: "FR (mpm)",
+            data: dataFR,
+            borderColor: "#10b981", // Verde
+            backgroundColor: "#10b981",
+            yAxisID: "y1", // Compartilha eixo com FC
+            tension: 0.2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          y: { type: "linear", display: true, position: "left", title: { display: true, text: "Temperatura (°C)" } },
+          y1: { type: "linear", display: true, position: "right", title: { display: true, text: "Frequência" }, grid: { drawOnChartArea: false } },
+        },
+      },
+    });
   }
 
   window.excluirAfericao = function (id) {

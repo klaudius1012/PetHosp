@@ -63,7 +63,9 @@ function carregarHistoricoPrescricoes(atendimentoId) {
         <button class="btn-visualizar" title="Visualizar" onclick="visualizarPrescricao('${
           p.id
         }')" style="cursor:pointer; border:none; background:transparent; margin-right: 5px; font-size: 1.2rem;">👁️</button>
-        <button class="btn-duplicar" title="Duplicar" onclick="duplicarPrescricao('${p.id}')" style="cursor:pointer; border:none; background:transparent; margin-right: 5px; font-size: 1.2rem;">📋</button>
+        <button class="btn-duplicar" title="Duplicar" onclick="duplicarPrescricao('${
+          p.id
+        }')" style="cursor:pointer; border:none; background:transparent; margin-right: 5px; font-size: 1.2rem;">📋</button>
         <button class="btn-imprimir" title="Imprimir" onclick="imprimirPrescricao('${
           p.id
         }')" style="cursor:pointer; border:none; background:transparent; font-size: 1.2rem;">🖨️</button>
@@ -135,63 +137,95 @@ function imprimirPrescricao(id) {
   }
 
   // Buscar dados adicionais vinculados ao atendimento
-  const evolucoes = (JSON.parse(localStorage.getItem("evolucoes")) || []).filter(
-    (e) => e.atendimentoId === prescricao.atendimentoId
-  );
+  const evolucoes = (
+    JSON.parse(localStorage.getItem("evolucoes")) || []
+  ).filter((e) => e.atendimentoId === prescricao.atendimentoId);
   const exames = (JSON.parse(localStorage.getItem("exames")) || []).filter(
     (e) => e.atendimentoId === prescricao.atendimentoId
   );
-  const procedimentos = (JSON.parse(localStorage.getItem("procedimentos")) || []).filter(
-    (p) => p.atendimentoId === prescricao.atendimentoId
-  );
-  const afericoes = (JSON.parse(localStorage.getItem("afericoes")) || []).filter(
-    (a) => a.atendimentoId === prescricao.atendimentoId
-  );
+  const procedimentos = (
+    JSON.parse(localStorage.getItem("procedimentos")) || []
+  ).filter((p) => p.atendimentoId === prescricao.atendimentoId);
+  const afericoes = (
+    JSON.parse(localStorage.getItem("afericoes")) || []
+  ).filter((a) => a.atendimentoId === prescricao.atendimentoId);
 
   // Gerar HTML para seções extras
   let htmlExtras = "";
 
   if (evolucoes.length > 0) {
     htmlExtras += `<h3>Evoluções Clínicas</h3>
-    <table>
+    <table class="print-table">
       <thead><tr><th>Data/Hora</th><th>Descrição</th></tr></thead>
       <tbody>
-        ${evolucoes.map(e => `<tr><td>${e.data || e.dataEvolucao} ${e.hora || e.horaEvolucao}</td><td>${e.descricao || e.descricaoEvolucao}</td></tr>`).join("")}
+        ${evolucoes
+          .map(
+            (e) =>
+              `<tr><td>${e.data || e.dataEvolucao} ${
+                e.hora || e.horaEvolucao
+              }</td><td>${e.descricao || e.descricaoEvolucao}</td></tr>`
+          )
+          .join("")}
       </tbody>
     </table>`;
   }
 
   if (exames.length > 0) {
     htmlExtras += `<h3>Exames Solicitados</h3>
-    <table>
+    <table class="print-table">
       <thead><tr><th>Tipo</th><th>Prioridade</th><th>Indicação</th></tr></thead>
       <tbody>
-        ${exames.map(e => `<tr><td>${e.tipo || e.tipoExame}</td><td>${e.prioridade || e.prioridadeExame}</td><td>${e.indicacao || e.indicacaoClinica}</td></tr>`).join("")}
+        ${exames
+          .map(
+            (e) =>
+              `<tr><td>${e.tipo || e.tipoExame}</td><td>${
+                e.prioridade || e.prioridadeExame
+              }</td><td>${e.indicacao || e.indicacaoClinica}</td></tr>`
+          )
+          .join("")}
       </tbody>
     </table>`;
   }
 
   if (procedimentos.length > 0) {
     htmlExtras += `<h3>Procedimentos</h3>
-    <table>
+    <table class="print-table">
       <thead><tr><th>Nome</th><th>Detalhes</th></tr></thead>
       <tbody>
-        ${procedimentos.map(p => `<tr><td>${p.nome}</td><td>${p.detalhes || "-"}</td></tr>`).join("")}
+        ${procedimentos
+          .map(
+            (p) => `<tr><td>${p.nome}</td><td>${p.detalhes || "-"}</td></tr>`
+          )
+          .join("")}
       </tbody>
     </table>`;
   }
 
   if (afericoes.length > 0) {
     htmlExtras += `<h3>Aferições / Sinais Vitais</h3>
-    <table>
+    <table class="print-table">
       <thead><tr><th>Data/Hora</th><th>Temp</th><th>FC</th><th>FR</th></tr></thead>
       <tbody>
-        ${afericoes.map(a => `<tr><td>${a.data} ${a.hora}</td><td>${a.temperatura || "-"}</td><td>${a.fc || "-"}</td><td>${a.fr || "-"}</td></tr>`).join("")}
+        ${afericoes
+          .map(
+            (a) =>
+              `<tr><td>${a.data} ${a.hora}</td><td>${
+                a.temperatura || "-"
+              }</td><td>${a.fc || "-"}</td><td>${a.fr || "-"}</td></tr>`
+          )
+          .join("")}
       </tbody>
     </table>`;
   }
 
-  const janelaImpressao = window.open("", "_blank");
+  // Preencher dados no template de impressão (DOM)
+  document.getElementById("print-vet").textContent =
+    prescricao.veterinario || "--";
+  document.getElementById("print-data").textContent = new Date(
+    prescricao.data
+  ).toLocaleString();
+  document.getElementById("print-tutor").textContent = nomeTutor;
+  document.getElementById("print-animal").textContent = nomeAnimal;
 
   const linhasMedicamentos = prescricao.medicamentos
     .map(
@@ -205,86 +239,22 @@ function imprimirPrescricao(id) {
     )
     .join("");
 
-  const conteudo = `
-    <html>
-      <head>
-        <title>Prescrição - ${nomeAnimal}</title>
-        <style>
-          body { font-family: sans-serif; padding: 40px; color: #333; }
-          .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid #2dd4bf; padding-bottom: 20px; }
-          .brand { display: flex; align-items: center; gap: 15px; }
-          .brand img { max-height: 80px; width: auto; }
-          .brand h1 { margin: 0; color: #0f766e; font-size: 28px; }
-          .contact-info { text-align: right; font-size: 0.85rem; color: #666; line-height: 1.5; }
-          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; }
-          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-          th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-          th { background-color: #f0fcf9; color: #0f766e; }
-          .obs { margin-top: 20px; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
-          .footer { margin-top: 60px; text-align: center; font-size: 0.9em; color: #666; }
-          .assinatura { margin-top: 50px; border-top: 1px solid #333; width: 300px; margin-left: auto; margin-right: auto; padding-top: 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div class="brand">
-            <img src="../img/logo.png" alt="Logo" onerror="this.style.display='none'">
-            <h1>PetClin</h1>
-          </div>
-          <div class="contact-info">
-            <strong>Clínica Veterinária</strong><br>
-            Rua Exemplo, 123 - Centro<br>
-            (11) 99999-9999 | contato@petclin.com
-          </div>
-        </div>
+  document.getElementById("print-medicamentos-tbody").innerHTML =
+    linhasMedicamentos;
+  document.getElementById("print-extras").innerHTML = htmlExtras;
 
-        <div class="info-grid">
-          <div><strong>Veterinário:</strong> ${
-            prescricao.veterinario || "--"
-          }</div>
-          <div><strong>Data:</strong> ${new Date(
-            prescricao.data
-          ).toLocaleString()}</div>
-          <div><strong>Tutor:</strong> ${nomeTutor}</div>
-          <div><strong>Paciente:</strong> ${nomeAnimal}</div>
-        </div>
+  const obsContainer = document.getElementById("print-obs-container");
+  if (prescricao.observacoes) {
+    document.getElementById("print-obs-text").innerHTML =
+      prescricao.observacoes.replace(/\n/g, "<br>");
+    obsContainer.style.display = "block";
+  } else {
+    obsContainer.style.display = "none";
+  }
 
-        <h3>Prescrição Médica</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Medicamento</th>
-              <th>Dose</th>
-              <th>Intervalo</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${linhasMedicamentos}
-          </tbody>
-        </table>
+  document.getElementById("print-data-impressao").textContent =
+    new Date().toLocaleString();
 
-        ${htmlExtras}
-
-        ${
-          prescricao.observacoes
-            ? `<div class="obs"><strong>Observações:</strong><br>${prescricao.observacoes.replace(
-                /\n/g,
-                "<br>"
-              )}</div>`
-            : ""
-        }
-
-        <div class="footer">
-          <div class="assinatura">Assinatura do Veterinário</div>
-          <p>Impresso em ${new Date().toLocaleString()}</p>
-        </div>
-        <script>
-          window.onload = () => { window.print(); };
-        </script>
-      </body>
-    </html>
-  `;
-
-  janelaImpressao.document.write(conteudo);
-  janelaImpressao.document.close();
+  // Acionar impressão
+  window.print();
 }

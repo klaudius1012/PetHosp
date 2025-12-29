@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prescrição - PetClin</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+
+      /* Estilos do Cabeçalho de Impressão */
+      #print-header {
+        display: none; /* Oculto na visualização de tela normal */
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Regras específicas para Impressão */
+      @media print {
+        @page {
+          margin: 2cm;
+        }
+
+        body {
+          background: white;
+          font-size: 12pt;
+        }
+
+        /* Exibe o cabeçalho apenas na impressão */
+        #print-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 15px;
+          margin-bottom: 30px;
+          width: 100%;
+        }
+
+        .header-logo img {
+          height: 60px; /* Ajuste conforme seu logo */
+        }
+
+        .header-info {
+          text-align: right;
+          font-size: 10pt;
+        }
+
+        .header-info h1 {
+          margin: 0;
+          font-size: 18pt;
+          color: #000;
+        }
+
+        /* Oculta botões e elementos de navegação na impressão */
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cabeçalho Exclusivo para Impressão -->
+    <header id="print-header">
+      <div class="header-logo">
+        <!-- Substitua o src pelo caminho do seu logo real -->
+        <svg
+          width="60"
+          height="60"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#333"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <div class="header-info">
+        <h1>PetClin</h1>
+        <p>Rua dos Animais, 123 - Centro</p>
+        <p>Tel: (11) 9999-9999 | CRMV-SP 12345</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div
+        class="no-print"
+        style="
+          margin-bottom: 20px;
+          padding: 10px;
+          background: #f8f9fa;
+          border-radius: 5px;
+        "
+      >
+        <button
+          onclick="window.print()"
+          style="
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          🖨️ Imprimir Receita
+        </button>
+        <button
+          onclick="history.back()"
+          style="padding: 10px 20px; cursor: pointer; margin-left: 10px"
+        >
+          Voltar
+        </button>
+      </div>
+
+      <main>
+        <h2>Receituário</h2>
+        <!-- Conteúdo da prescrição virá aqui -->
+        <div id="conteudo-prescricao">
+          <p><em>Os detalhes da prescrição aparecerão aqui...</em></p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

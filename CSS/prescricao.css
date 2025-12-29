@@ -1,109 +1,157 @@
 @import url("global.css");
 
-.btn {
-  width: 140px;
-}
-
-/* =========================================
-   ESTILOS PADRONIZADOS (Tabelas e Layout)
-   ========================================= */
-
-/* --- Ações e Botões --- */
+/* Estilos da Página de Listagem */
 .actions-container {
-  margin-top: 1rem;
+  margin-bottom: 1.5rem;
   display: flex;
-  align-items: center;
   gap: 1rem;
 }
 
-/* --- Barra de Busca --- */
-.search-container {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+.actions-container .btn {
+  width: auto;
+  margin: 0;
 }
 
 /* =========================================
-   CABEÇALHO DO PACIENTE (Prescrição)
+   ESTILOS DE IMPRESSÃO
    ========================================= */
-.btn-imprimir {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
+
+/* Oculta a área de impressão na tela normal */
+#print-section {
+  display: none;
 }
 
-.btn-imprimir:hover {
-  transform: scale(1.2);
-}
+@media print {
+  /* Oculta tudo que não é da impressão */
+  body * {
+    visibility: hidden;
+  }
 
-/* Estilos de Formulário e Cards (Exames/Evoluções) */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
+  .no-print,
+  .login-card,
+  .sidebar,
+  #logoutBtn {
+    display: none !important;
+  }
 
-.full-width {
-  grid-column: 1 / -1;
-}
+  /* Exibe e posiciona a área de impressão */
+  #print-section,
+  #print-section * {
+    visibility: visible;
+  }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  #print-section {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 40px;
+    background: white;
+    color: #333;
+    font-family: sans-serif;
+  }
 
-.form-group label {
-  font-weight: bold;
-  color: #333;
-}
+  /* Estilos específicos do layout de impressão */
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #2dd4bf;
+    padding-bottom: 20px;
+  }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: inherit;
-}
+  .print-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
 
-.historico-list {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  .print-brand img {
+    max-height: 80px;
+    width: auto;
+  }
 
-.exame-card {
-  background: #f9f9f9;
-  padding: 1rem;
-  border-left: 4px solid #0f766e;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+  .print-brand h1 {
+    margin: 0;
+    color: #0f766e;
+    font-size: 28px;
+  }
 
-.exame-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #555;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
-}
+  .print-contact-info {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+  }
 
-.exame-desc {
-  white-space: pre-wrap;
-  color: #333;
-  line-height: 1.5;
-}
+  .print-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 30px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
 
-.divider-spacing {
-  margin: 2rem 0;
-}
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
 
-.mt-2 {
-  margin-top: 2rem;
+  .print-table th,
+  .print-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+
+  .print-table th {
+    background-color: #f0fcf9;
+    color: #0f766e;
+  }
+
+  .print-obs {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+  }
+
+  .print-footer {
+    margin-top: 120px;
+    text-align: center;
+    font-size: 0.9em;
+    color: #666;
+  }
+
+  .print-assinatura {
+    margin-top: 50px;
+    border-top: 1px solid #333;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 10px;
+  }
+
+  /* Estilos para tabelas extras (evoluções, etc) */
+  #print-extras table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  #print-extras th,
+  #print-extras td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  #print-extras th {
+    background-color: #f9fafb;
+  }
 }

@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
               th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
               th { background-color: #f0fcf9; color: #0f766e; }
               .obs { margin-top: 20px; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
-              .footer { margin-top: 60px; text-align: center; font-size: 0.9em; color: #666; }
+              .footer { margin-top: 120px; text-align: center; font-size: 0.9em; color: #666; }
               .assinatura { margin-top: 50px; border-top: 1px solid #333; width: 300px; margin-left: auto; margin-right: auto; padding-top: 10px; }
             </style>
           </head>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Editar Pet - PetClin</title>
+    <title>Editar Pet</title>
     <link rel="stylesheet" href="../CSS/pet.css" />
   </head>
   <body>
@@ -30,16 +30,7 @@
               />
               <span id="foto-placeholder" class="photo-placeholder">📷</span>
             </div>
-            <div class="photo-actions">
-              <label for="foto" class="photo-label">Alterar foto</label>
-              <button
-                type="button"
-                id="btnRemoverFoto"
-                class="btn-remove-photo"
-              >
-                Remover foto
-              </button>
-            </div>
+            <label for="foto" class="photo-label">Alterar foto</label>
             <input
               type="file"
               id="foto"
@@ -48,7 +39,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group full-width">
             <label for="tutorInput">Tutor Responsável</label>
             <input
               type="text"
@@ -58,11 +49,21 @@
               placeholder="Digite o nome ou CPF para buscar..."
             />
             <datalist id="listaTutores"></datalist>
+            <input type="hidden" id="tutor" />
           </div>
 
           <div class="form-group">
             <label for="nome">Nome do Pet</label>
             <input type="text" id="nome" required placeholder="Ex: Rex" />
+          </div>
+
+          <div class="form-group">
+            <label for="nascimento">Data de Nascimento (aproximada)</label>
+            <input type="date" id="nascimento" />
+            <span
+              id="idade-calculada"
+              style="font-size: 0.9rem; color: #666; margin-top: 0.25rem"
+            ></span>
           </div>
 
           <div class="form-group">
@@ -90,20 +91,6 @@
           </div>
 
           <div class="form-group">
-            <label for="nascimento">Data de Nascimento (aproximada)</label>
-            <input type="date" id="nascimento" />
-            <span
-              id="idade-calculada"
-              style="font-size: 0.9rem; color: #666; margin-top: 0.25rem"
-            ></span>
-          </div>
-
-          <div class="form-group">
-            <label for="peso">Peso (kg)</label>
-            <input type="number" id="peso" step="0.1" placeholder="Ex: 12.5" />
-          </div>
-
-          <div class="form-group">
             <label for="porte">Porte</label>
             <select id="porte" required>
               <option value="">Selecione...</option>
@@ -115,6 +102,11 @@
           </div>
 
           <div class="form-group">
+            <label for="peso">Peso (kg)</label>
+            <input type="number" id="peso" step="0.1" placeholder="Ex: 12.5" />
+          </div>
+
+          <div class="form-group">
             <label for="condicaoReprodutiva">Condição Reprodutiva</label>
             <select id="condicaoReprodutiva" required>
               <option value="Inteiro">Inteiro</option>
@@ -123,31 +115,87 @@
           </div>
 
           <div class="form-group">
-            <label for="alergias">Alergias</label>
-            <input type="text" id="alergias" placeholder="Informe alergias conhecidas..." />
-          </div>
-
-          <div class="form-group">
-            <label for="vacinacao">Vacinação</label>
-            <input type="text" id="vacinacao" placeholder="Status vacinal (ex: V8, Antirrábica em dia)" />
-          </div>
-
-          <div class="form-group">
-            <label for="dataRevacina">Próxima Vacinação</label>
-            <input type="date" id="dataRevacina" />
-            <div id="alertaVacinacao" style="display: none; color: #7f1d1d; background-color: #fca5a5; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #ef4444; font-weight: bold;">
-              ⚠️ ATENÇÃO: A vacinação deste animal está vencida!
-            </div>
-          </div>
-
-          <div class="form-group">
             <label for="ambiente">Ambiente</label>
-            <input type="text" id="ambiente" placeholder="Ambiente em que vive (ex: Casa, Apartamento)" />
+            <input
+              type="text"
+              id="ambiente"
+              placeholder="Ambiente em que vive (ex: Casa, Apartamento)"
+            />
           </div>
 
           <div class="form-group">
             <label for="alimentacao">Alimentação</label>
-            <input type="text" id="alimentacao" placeholder="Tipo de alimentação (ex: Ração Premium, AN)" />
+            <input
+              type="text"
+              id="alimentacao"
+              placeholder="Tipo de alimentação (ex: Ração Premium, AN)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Alergias</label>
+            <div class="alergias-container">
+              <input type="hidden" id="alergias" />
+              <button
+                type="button"
+                id="btnOpenAlergias"
+                class="btn-add-alergia"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Alergias
+              </button>
+              <div id="alergiasTags" class="alergias-tags"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="grid-row: span 2">
+            <label for="observacoes">Observações Gerais</label>
+            <textarea
+              id="observacoes"
+              placeholder="Histórico, comportamento ou outras observações..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Histórico de Vacinas</label>
+            <div class="alergias-container">
+              <input type="hidden" id="vacinacao" />
+              <button type="button" id="btnOpenVacinas" class="btn-add-vacina">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M19 21v-6m0 0-3-3m3 3 3-3"></path>
+                  <path d="M2 21h20"></path>
+                  <path
+                    d="M5 10a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"
+                  ></path>
+                  <path d="M12 3v5"></path>
+                </svg>
+                Vacinas
+              </button>
+              <div id="vacinasTags" class="alergias-tags"></div>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -164,6 +212,146 @@
           </div>
         </form>
       </main>
+    </div>
+
+    <!-- Modal de Edição de Alergias -->
+    <div id="modalAlergias" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Gerenciar Alergias</h3>
+        <div class="form-group">
+          <div style="display: flex; gap: 10px">
+            <input
+              type="text"
+              id="inputNovaAlergia"
+              placeholder="Digite uma alergia..."
+              list="sugestoesAlergias"
+            />
+            <datalist id="sugestoesAlergias">
+              <option value="Dipirona"></option>
+              <option value="Penicilina"></option>
+              <option value="AAS"></option>
+              <option value="Anti-inflamatórios"></option>
+              <option value="Picada de Insetos"></option>
+              <option value="Proteína do Leite"></option>
+              <option value="Frango"></option>
+              <option value="Carne Bovina"></option>
+            </datalist>
+            <button
+              type="button"
+              id="btnAddAlergiaItem"
+              class="btn btn-primary"
+              style="width: auto"
+            >
+              Adicionar
+            </button>
+          </div>
+        </div>
+        <ul id="listaAlergiasModal" class="lista-alergias-modal"></ul>
+        <div
+          class="btn-toolbar"
+          style="margin-top: 1rem; justify-content: flex-end"
+        >
+          <button
+            type="button"
+            id="btnCancelAlergias"
+            class="btn-cancel"
+            style="width: auto; margin-right: 10px"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            id="btnSaveAlergias"
+            class="btn btn-primary"
+            style="width: auto"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Edição de Vacinas -->
+    <div id="modalVacinas" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Gerenciar Vacinas</h3>
+        <div class="form-group">
+          <div style="display: flex; gap: 10px; flex-direction: column">
+            <input
+              type="text"
+              id="inputNomeVacina"
+              placeholder="Nome da Vacina (ex: V8, Antirrábica)"
+              list="sugestoesVacinas"
+            />
+            <datalist id="sugestoesVacinas">
+              <option value="V8 (Polivalente)"></option>
+              <option value="V10 (Polivalente)"></option>
+              <option value="Antirrábica"></option>
+              <option value="Giárdia"></option>
+              <option value="Tosse dos Canis (Gripe)"></option>
+              <option value="Leishmaniose"></option>
+              <option value="Quíntupla (Felina)"></option>
+            </datalist>
+            <div style="display: flex; gap: 10px; align-items: flex-end">
+              <div style="flex: 1">
+                <label
+                  style="
+                    font-size: 0.8rem;
+                    color: #555;
+                    display: block;
+                    margin-bottom: 2px;
+                  "
+                  >Data Aplicação</label
+                ><input type="date" id="inputDataVacina" style="width: 100%" />
+              </div>
+              <div style="flex: 1">
+                <label
+                  style="
+                    font-size: 0.8rem;
+                    color: #555;
+                    display: block;
+                    margin-bottom: 2px;
+                  "
+                  >Próxima Dose</label
+                ><input
+                  type="date"
+                  id="inputDataRevacinaItem"
+                  style="width: 100%"
+                />
+              </div>
+              <button
+                type="button"
+                id="btnAddVacinaItem"
+                class="btn btn-primary"
+                style="width: auto; height: 38px"
+              >
+                Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+        <ul id="listaVacinasModal" class="lista-alergias-modal"></ul>
+        <div
+          class="btn-toolbar"
+          style="margin-top: 1rem; justify-content: flex-end"
+        >
+          <button
+            type="button"
+            id="btnCancelVacinas"
+            class="btn-cancel"
+            style="width: auto; margin-right: 10px"
+          >
+            Cancelar</button
+          ><button
+            type="button"
+            id="btnSaveVacinas"
+            class="btn btn-primary"
+            style="width: auto"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="../JS/session-auth.js"></script>

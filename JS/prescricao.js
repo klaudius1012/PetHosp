@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   atualizarLinksAcao(atendimentoId);
 
   carregarHistoricoPrescricoes(atendimentoId);
+  setupModalAlergias(atendimentoId);
 });
 
 function atualizarLinksAcao(id) {
@@ -257,4 +258,99 @@ function imprimirPrescricao(id) {
 
   // Acionar impressão
   window.print();
+}
+
+function setupModalAlergias(atendimentoId) {
+  const btnOpenAlergias = document.getElementById("btnOpenAlergias");
+  const modalAlergias = document.getElementById("modalAlergias");
+  const inputNovaAlergia = document.getElementById("inputNovaAlergia");
+  const btnAddAlergiaItem = document.getElementById("btnAddAlergiaItem");
+  const listaAlergiasModal = document.getElementById("listaAlergiasModal");
+  const btnSaveAlergias = document.getElementById("btnSaveAlergias");
+  const btnCancelAlergias = document.getElementById("btnCancelAlergias");
+  let alergiasTemp = [];
+
+  // Ocultar opções de edição (Adicionar/Salvar) para visualização apenas
+  if (inputNovaAlergia && inputNovaAlergia.parentElement) {
+    inputNovaAlergia.parentElement.style.display = "none";
+  }
+  if (btnSaveAlergias) {
+    btnSaveAlergias.style.display = "none";
+  }
+  if (btnCancelAlergias) {
+    btnCancelAlergias.textContent = "Fechar";
+  }
+
+  function renderListaModal() {
+    if (!listaAlergiasModal) return;
+    listaAlergiasModal.innerHTML = "";
+    alergiasTemp.forEach((alergia, index) => {
+      const li = document.createElement("li");
+      li.textContent = alergia;
+      listaAlergiasModal.appendChild(li);
+    });
+  }
+
+  if (btnOpenAlergias) {
+    btnOpenAlergias.addEventListener("click", () => {
+      const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
+      const atendimento = atendimentos.find((a) => a.id === atendimentoId);
+      
+      let alergiasStr = atendimento ? atendimento.alergias : "";
+      if (!alergiasStr && atendimento) {
+          const animais = JSON.parse(localStorage.getItem("animais")) || [];
+          const animal = animais.find(a => a.id === atendimento.animalId || a.nome === atendimento.animal);
+          if (animal) alergiasStr = animal.alergias;
+      }
+
+      alergiasTemp = alergiasStr
+        ? alergiasStr.split(",").map((s) => s.trim()).filter((s) => s)
+        : [];
+      renderListaModal();
+      if (modalAlergias) modalAlergias.classList.remove("hidden");
+    });
+  }
+
+  if (btnAddAlergiaItem) {
+    btnAddAlergiaItem.addEventListener("click", () => {
+      const val = inputNovaAlergia.value.trim();
+      if (val) {
+        alergiasTemp.push(val);
+        inputNovaAlergia.value = "";
+        renderListaModal();
+      }
+    });
+  }
+
+  if (btnSaveAlergias) {
+    btnSaveAlergias.addEventListener("click", () => {
+      const novasAlergias = alergiasTemp.join(", ");
+      const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
+      const indexAt = atendimentos.findIndex((a) => a.id === atendimentoId);
+      let animalId = null;
+      let animalNome = null;
+      if (indexAt !== -1) {
+        atendimentos[indexAt].alergias = novasAlergias;
+        animalId = atendimentos[indexAt].animalId;
+        animalNome = atendimentos[indexAt].animal;
+        localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
+      }
+      const animais = JSON.parse(localStorage.getItem("animais")) || [];
+      const indexAn = animais.findIndex(a => a.id === animalId || a.nome === animalNome);
+      if (indexAn !== -1) {
+          animais[indexAn].alergias = novasAlergias;
+          localStorage.setItem("animais", JSON.stringify(animais));
+      }
+      const headerAlergias = document.getElementById("headerAlergias");
+      if (headerAlergias) headerAlergias.textContent = novasAlergias || "--";
+      if (modalAlergias) modalAlergias.classList.add("hidden");
+      alert("Alergias atualizadas!");
+    });
+  }
+
+  if (btnCancelAlergias) {
+    btnCancelAlergias.addEventListener("click", () => {
+      if (modalAlergias) modalAlergias.classList.add("hidden");
+    });
+  }
 }

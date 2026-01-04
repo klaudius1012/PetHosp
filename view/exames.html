@@ -29,7 +29,7 @@
             <h2>Solicitação de Exames</h2>
 
             <!-- Cabeçalho do Paciente (Dados do Atendimento) -->
-             <div class="atendimento-header">
+            <div class="atendimento-header">
               <div class="header-main header-row">
                 <div class="avatar-container">
                   <img
@@ -89,9 +89,40 @@
                   <span class="label">Temp.</span>
                   <span class="value"><span id="headerTemp">--</span> °C</span>
                 </div>
+                <div class="info-item">
+                  <span class="label">FC</span>
+                  <span class="value"><span id="headerFC">--</span> bpm</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">FR</span>
+                  <span class="value"><span id="headerFR">--</span> mpm</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">TPC</span>
+                  <span class="value"><span id="headerTPC">--</span> seg</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Mucosas</span>
+                  <span class="value" id="headerMucosas">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Hidratação</span>
+                  <span class="value" id="headerHidratacao">--</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Consciência</span>
+                  <span class="value" id="headerConsciencia">--</span>
+                </div>
                 <div class="info-item alert-item">
                   <span class="label">Alergias</span>
-                  <span class="value" id="headerAlergias">--</span>
+                  <span id="headerAlergias" style="display: none"></span>
+                  <button
+                    type="button"
+                    class="btn-ver-alergias"
+                    id="btnOpenAlergias"
+                  >
+                    VER ALERGIAS
+                  </button>
                 </div>
               </div>
               <br />
@@ -157,6 +188,63 @@
         </div>
       </section>
     </main>
+
+    <!-- Modal de Alergias -->
+    <div id="modalAlergias" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Gerenciar Alergias</h3>
+        <div class="form-group">
+          <div style="display: flex; gap: 10px">
+            <input
+              type="text"
+              id="inputNovaAlergia"
+              placeholder="Digite uma alergia..."
+              list="sugestoesAlergias"
+            />
+            <datalist id="sugestoesAlergias">
+              <option value="Dipirona"></option>
+              <option value="Penicilina"></option>
+              <option value="AAS"></option>
+              <option value="Anti-inflamatórios"></option>
+              <option value="Picada de Insetos"></option>
+              <option value="Proteína do Leite"></option>
+              <option value="Frango"></option>
+              <option value="Carne Bovina"></option>
+            </datalist>
+            <button
+              type="button"
+              id="btnAddAlergiaItem"
+              class="btn btn-primary"
+              style="width: auto"
+            >
+              Adicionar
+            </button>
+          </div>
+        </div>
+        <ul id="listaAlergiasModal" class="lista-alergias-modal"></ul>
+        <div
+          class="btn-toolbar"
+          style="margin-top: 1rem; justify-content: flex-end"
+        >
+          <button
+            type="button"
+            id="btnCancelAlergias"
+            class="btn-cancel"
+            style="width: auto; margin-right: 10px"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            id="btnSaveAlergias"
+            class="btn btn-primary"
+            style="width: auto"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <button id="logoutBtn" class="btn-btn-logout">Sair</button>
 

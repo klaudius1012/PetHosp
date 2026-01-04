@@ -4,6 +4,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputNascimento = document.getElementById("nascimento");
   const spanIdade = document.getElementById("idade-calculada");
 
+  // Elementos do Modal de Alergias
+  const btnOpenAlergias = document.getElementById("btnOpenAlergias");
+  const modalAlergias = document.getElementById("modalAlergias");
+  const inputNovaAlergia = document.getElementById("inputNovaAlergia");
+  const btnAddAlergiaItem = document.getElementById("btnAddAlergiaItem");
+  const listaAlergiasModal = document.getElementById("listaAlergiasModal");
+  const btnSaveAlergias = document.getElementById("btnSaveAlergias");
+  const btnCancelAlergias = document.getElementById("btnCancelAlergias");
+  const alergiasTags = document.getElementById("alergiasTags");
+  const inputAlergias = document.getElementById("alergias");
+  let alergiasTemp = [];
+
+  // Elementos do Modal de Vacinas
+  const btnOpenVacinas = document.getElementById("btnOpenVacinas");
+  const modalVacinas = document.getElementById("modalVacinas");
+  const inputNomeVacina = document.getElementById("inputNomeVacina");
+  const inputDataVacina = document.getElementById("inputDataVacina");
+  const inputDataRevacinaItem = document.getElementById(
+    "inputDataRevacinaItem"
+  );
+  const btnAddVacinaItem = document.getElementById("btnAddVacinaItem");
+  const listaVacinasModal = document.getElementById("listaVacinasModal");
+  const btnSaveVacinas = document.getElementById("btnSaveVacinas");
+  const btnCancelVacinas = document.getElementById("btnCancelVacinas");
+  const vacinasTags = document.getElementById("vacinasTags");
+  const inputVacinacao = document.getElementById("vacinacao");
+  let vacinasTemp = [];
+
   // Carregar Tutores para o Datalist
   const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
   const datalist = document.getElementById("listaTutores");
@@ -121,9 +149,9 @@ document.addEventListener("DOMContentLoaded", () => {
       condicaoReprodutiva: document.getElementById("condicaoReprodutiva").value,
       alergias: document.getElementById("alergias").value,
       vacinacao: document.getElementById("vacinacao").value, // Novo campo
-      dataRevacina: document.getElementById("dataRevacina").value, // Novo campo
       ambiente: document.getElementById("ambiente").value, // Novo campo
       alimentacao: document.getElementById("alimentacao").value, // Novo campo
+      observacoes: document.getElementById("observacoes").value,
       foto: fotoBase64,
     };
 
@@ -134,4 +162,250 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Pet cadastrado com sucesso!");
     window.location.href = "animais.html";
   });
+
+  // --- Lógica do Modal de Alergias ---
+
+  function renderAlergiasTags() {
+    if (!alergiasTags || !inputAlergias) return;
+    alergiasTags.innerHTML = "";
+    const alergiasStr = inputAlergias.value;
+    if (!alergiasStr) return;
+
+    const lista = alergiasStr
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s);
+    lista.forEach((alergia) => {
+      const tag = document.createElement("span");
+      tag.className = "alergia-tag";
+      tag.textContent = alergia;
+      alergiasTags.appendChild(tag);
+    });
+  }
+
+  function renderListaModal() {
+    listaAlergiasModal.innerHTML = "";
+    alergiasTemp.forEach((alergia, index) => {
+      const li = document.createElement("li");
+      li.textContent = alergia;
+
+      const btnRemove = document.createElement("button");
+      btnRemove.textContent = "❌";
+      btnRemove.style.marginLeft = "10px";
+      btnRemove.style.border = "none";
+      btnRemove.style.background = "transparent";
+      btnRemove.style.cursor = "pointer";
+      btnRemove.onclick = () => {
+        alergiasTemp.splice(index, 1);
+        renderListaModal();
+      };
+
+      li.appendChild(btnRemove);
+      listaAlergiasModal.appendChild(li);
+    });
+  }
+
+  if (btnOpenAlergias) {
+    btnOpenAlergias.addEventListener("click", () => {
+      const val = inputAlergias.value;
+      alergiasTemp = val
+        ? val
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s)
+        : [];
+      renderListaModal();
+      modalAlergias.classList.remove("hidden");
+    });
+  }
+
+  if (btnAddAlergiaItem) {
+    btnAddAlergiaItem.addEventListener("click", () => {
+      const val = inputNovaAlergia.value.trim();
+      if (val) {
+        alergiasTemp.push(val);
+        inputNovaAlergia.value = "";
+        renderListaModal();
+      }
+    });
+  }
+
+  if (btnSaveAlergias) {
+    btnSaveAlergias.addEventListener("click", () => {
+      inputAlergias.value = alergiasTemp.join(", ");
+      renderAlergiasTags();
+      modalAlergias.classList.add("hidden");
+    });
+  }
+
+  if (btnCancelAlergias) {
+    btnCancelAlergias.addEventListener("click", () => {
+      modalAlergias.classList.add("hidden");
+    });
+  }
+
+  // --- Lógica do Modal de Vacinas ---
+
+  function renderVacinasTags() {
+    if (!vacinasTags || !inputVacinacao) return;
+    vacinasTags.innerHTML = "";
+    const vacinasStr = inputVacinacao.value;
+
+    let lista = [];
+    try {
+      lista = vacinasStr ? JSON.parse(vacinasStr) : [];
+    } catch (e) {
+      // Fallback para string antiga se existir
+      if (vacinasStr) lista = [{ nome: vacinasStr, data: "", revacina: "" }];
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    lista.forEach((vacina) => {
+      const tag = document.createElement("span");
+      tag.className = "vacina-tag";
+
+      let isVencida = false;
+      if (vacina.revacina) {
+        const [ano, mes, dia] = vacina.revacina.split("-").map(Number);
+        const dataRevacina = new Date(ano, mes - 1, dia);
+        if (dataRevacina < hoje) {
+          tag.classList.add("vencida");
+          isVencida = true;
+        }
+      }
+
+      // Formata a data se existir
+      const dataFormatada = vacina.data
+        ? new Date(vacina.data).toLocaleDateString("pt-BR")
+        : "";
+      const revacinaFormatada = vacina.revacina
+        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
+        : "";
+
+      let texto = vacina.nome;
+      if (dataFormatada) texto += ` (${dataFormatada})`;
+      if (revacinaFormatada) texto += ` ➝ Rev: ${revacinaFormatada}`;
+      if (isVencida) texto += " ⚠️";
+      tag.textContent = texto;
+      vacinasTags.appendChild(tag);
+    });
+  }
+
+  function renderListaVacinasModal() {
+    listaVacinasModal.innerHTML = "";
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    vacinasTemp.forEach((vacina, index) => {
+      const li = document.createElement("li");
+      const divInfo = document.createElement("div");
+      const dataFormatada = vacina.data
+        ? new Date(vacina.data).toLocaleDateString("pt-BR")
+        : "Sem data";
+      const revacinaFormatada = vacina.revacina
+        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
+        : "-";
+
+      divInfo.textContent = `${vacina.nome} | Aplic: ${dataFormatada} | Próx: ${revacinaFormatada}`;
+
+      if (vacina.revacina) {
+        const [ano, mes, dia] = vacina.revacina.split("-").map(Number);
+        const dataRevacina = new Date(ano, mes - 1, dia);
+        if (dataRevacina < hoje) {
+          li.style.color = "#b91c1c";
+          li.style.backgroundColor = "#fef2f2";
+          const spanAlert = document.createElement("span");
+          spanAlert.textContent = " ⚠️ VENCIDA";
+          spanAlert.style.fontWeight = "bold";
+          spanAlert.style.marginLeft = "5px";
+          divInfo.appendChild(spanAlert);
+        }
+      }
+      li.appendChild(divInfo);
+
+      const btnRemove = document.createElement("button");
+      btnRemove.textContent = "❌";
+      btnRemove.style.marginLeft = "10px";
+      btnRemove.style.border = "none";
+      btnRemove.style.background = "transparent";
+      btnRemove.style.cursor = "pointer";
+      btnRemove.onclick = () => {
+        vacinasTemp.splice(index, 1);
+        renderListaVacinasModal();
+      };
+
+      li.appendChild(btnRemove);
+      listaVacinasModal.appendChild(li);
+    });
+  }
+
+  // Cálculo automático da revacina (padrão 1 ano)
+  function calcularRevacina() {
+    const dataAplicacao = inputDataVacina.value;
+    if (dataAplicacao) {
+      const data = new Date(dataAplicacao);
+      // Adiciona 365 dias (1 ano) como padrão
+      data.setDate(data.getDate() + 365);
+      inputDataRevacinaItem.value = data.toISOString().split("T")[0];
+    }
+  }
+
+  if (inputDataVacina) {
+    inputDataVacina.addEventListener("change", calcularRevacina);
+  }
+  if (inputNomeVacina) {
+    // Recalcula ao selecionar vacina caso a data já esteja preenchida
+    inputNomeVacina.addEventListener("input", () => {
+      if (inputDataVacina.value && !inputDataRevacinaItem.value)
+        calcularRevacina();
+    });
+  }
+
+  if (btnOpenVacinas) {
+    btnOpenVacinas.addEventListener("click", () => {
+      const val = inputVacinacao.value;
+      try {
+        vacinasTemp = val ? JSON.parse(val) : [];
+      } catch (e) {
+        vacinasTemp = val ? [{ nome: val, data: "", revacina: "" }] : [];
+      }
+      renderListaVacinasModal();
+      modalVacinas.classList.remove("hidden");
+    });
+  }
+
+  if (btnAddVacinaItem) {
+    btnAddVacinaItem.addEventListener("click", () => {
+      const nome = inputNomeVacina.value.trim();
+      const data = inputDataVacina.value;
+      const revacina = inputDataRevacinaItem.value;
+
+      if (nome) {
+        vacinasTemp.push({ nome, data, revacina });
+        inputNomeVacina.value = "";
+        inputDataVacina.value = "";
+        inputDataRevacinaItem.value = "";
+        inputNomeVacina.focus();
+        renderListaVacinasModal();
+      } else {
+        alert("Digite o nome da vacina.");
+      }
+    });
+  }
+
+  if (btnSaveVacinas) {
+    btnSaveVacinas.addEventListener("click", () => {
+      inputVacinacao.value = JSON.stringify(vacinasTemp);
+      renderVacinasTags();
+      modalVacinas.classList.add("hidden");
+    });
+  }
+
+  if (btnCancelVacinas) {
+    btnCancelVacinas.addEventListener("click", () => {
+      modalVacinas.classList.add("hidden");
+    });
+  }
 });

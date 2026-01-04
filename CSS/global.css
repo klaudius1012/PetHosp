@@ -592,3 +592,43 @@ button:disabled {
   max-width: 500px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
+
+/* =========================================
+   ESTILOS COMPARTILHADOS (ALERGIAS & ALERTAS)
+   ========================================= */
+
+/* Botão Ver Alergias */
+.btn-ver-alergias {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.btn-blink {
+  background-color: #dc3545;
+  animation: blink 1s infinite;
+}
+
+/* Alerta para parâmetros de triagem fora do normal */
+.info-item.param-alert {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+}
+
+.info-item.param-alert .value {
+  color: #b91c1c;
+  font-weight: bold;
+}

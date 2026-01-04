@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   let chartInstance = null;
+  let chartPressaoInstance = null;
+  let chartGlicemiaInstance = null;
   const params = new URLSearchParams(window.location.search);
   const atendimentoId = params.get("id");
 
@@ -15,6 +17,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputTemp = document.getElementById("tempAfericao");
   const inputFC = document.getElementById("fcAfericao");
   const inputFR = document.getElementById("frAfericao");
+  const inputTPC = document.getElementById("tpcAfericao");
+  const inputPaSistolica = document.getElementById("paSistolica");
+  const inputPaDiastolica = document.getElementById("paDiastolica");
+  const inputGlicemia = document.getElementById("glicemiaAfericao");
+  const inputMucosas = document.getElementById("mucosasAfericao");
+  const inputHidratacao = document.getElementById("hidratacaoAfericao");
+  const inputConsciencia = document.getElementById("conscienciaAfericao");
+  const inputUrina = document.getElementById("urinaAfericao");
   const inputObs = document.getElementById("obsAfericao");
   const listaContainer = document.getElementById("listaAfericoes");
 
@@ -37,9 +47,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function salvarAfericao() {
     // Validação básica: pelo menos um sinal vital deve ser preenchido
-    if (!inputTemp.value && !inputFC.value && !inputFR.value) {
-      alert("Preencha pelo menos um sinal vital (Temp, FC ou FR).");
+    if (
+      !inputTemp.value &&
+      !inputFC.value &&
+      !inputFR.value &&
+      !inputTPC.value &&
+      !inputPaSistolica.value &&
+      !inputPaDiastolica.value &&
+      !inputGlicemia.value &&
+      !inputMucosas.value &&
+      !inputHidratacao.value &&
+      !inputConsciencia.value
+    ) {
+      alert("Preencha pelo menos um parâmetro clínico.");
       return;
+    }
+
+    let pressaoVal = "";
+    if (inputPaSistolica.value || inputPaDiastolica.value) {
+      pressaoVal = `${inputPaSistolica.value || "?"}/${
+        inputPaDiastolica.value || "?"
+      }`;
     }
 
     const novaAfericao = {
@@ -50,6 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
       temperatura: inputTemp.value,
       fc: inputFC.value,
       fr: inputFR.value,
+      tpc: inputTPC.value,
+      pressao: pressaoVal,
+      glicemia: inputGlicemia.value,
+      mucosas: inputMucosas.value,
+      hidratacao: inputHidratacao.value,
+      consciencia: inputConsciencia.value,
+      urina: inputUrina.value,
       obs: inputObs ? inputObs.value.trim() : "",
       dataRegistro: new Date().toISOString(),
     };
@@ -62,6 +97,14 @@ document.addEventListener("DOMContentLoaded", () => {
     inputTemp.value = "";
     inputFC.value = "";
     inputFR.value = "";
+    inputTPC.value = "";
+    inputPaSistolica.value = "";
+    inputPaDiastolica.value = "";
+    inputGlicemia.value = "";
+    inputMucosas.value = "";
+    inputHidratacao.value = "";
+    inputConsciencia.value = "";
+    inputUrina.value = "";
     if (inputObs) inputObs.value = "";
     carregarAfericoes();
   }
@@ -90,8 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       lista.forEach((af) => {
         const card = document.createElement("div");
-        card.style.cssText =
-          "background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-left: 4px solid #0f766e;";
+        card.className = "afericao-card";
 
         const dataFormatada = new Date(af.data).toLocaleDateString();
 
@@ -101,24 +143,41 @@ document.addEventListener("DOMContentLoaded", () => {
           sinais.push(`<strong>Temp:</strong> ${af.temperatura}°C`);
         if (af.fc) sinais.push(`<strong>FC:</strong> ${af.fc} bpm`);
         if (af.fr) sinais.push(`<strong>FR:</strong> ${af.fr} mpm`);
+        if (af.tpc) sinais.push(`<strong>TPC:</strong> ${af.tpc}s`);
+        if (af.pressao) sinais.push(`<strong>PA:</strong> ${af.pressao}`);
+        if (af.glicemia) sinais.push(`<strong>Glic:</strong> ${af.glicemia}`);
+
+        let qualitativos = [];
+        if (af.mucosas)
+          qualitativos.push(`<strong>Mucosas:</strong> ${af.mucosas}`);
+        if (af.hidratacao)
+          qualitativos.push(`<strong>Hidrat:</strong> ${af.hidratacao}`);
+        if (af.consciencia)
+          qualitativos.push(`<strong>Cons:</strong> ${af.consciencia}`);
+        if (af.urina) qualitativos.push(`<strong>Urina:</strong> ${af.urina}`);
 
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px;">
-              <div style="color: #0f766e; font-size: 1rem;">
-                 ${sinais.join(" | ")}
+            <div class="afericao-header">
+              <div class="afericao-info-col">
+                <div class="sinais-vitais">
+                   ${sinais.join(" | ")}
+                </div>
+                <div class="qualitativos">
+                   ${qualitativos.join(" | ")}
+                </div>
               </div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 0.85rem; color: #666;">${dataFormatada} às ${
+              <div class="afericao-meta">
+                <span class="afericao-date">${dataFormatada} às ${
           af.hora
         }</span>
                 <button onclick="excluirAfericao('${
                   af.id
-                }')" title="Excluir" style="background: none; border: none; cursor: pointer; font-size: 1.1rem;">🗑️</button>
+                }')" title="Excluir" class="btn-delete">🗑️</button>
               </div>
             </div>
             ${
               af.obs
-                ? `<div style="color: #374151; font-size: 0.9rem;"><em>Obs: ${af.obs}</em></div>`
+                ? `<div class="afericao-obs"><em>Obs: ${af.obs}</em></div>`
                 : ""
             }
           `;
@@ -139,13 +198,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const labels = dadosOrdenados.map((a) => {
-      const data = new Date(a.data).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' });
+      const data = new Date(a.data).toLocaleDateString(undefined, {
+        day: "2-digit",
+        month: "2-digit",
+      });
       return `${data} ${a.hora}`;
     });
 
     const dataTemp = dadosOrdenados.map((a) => a.temperatura || null);
     const dataFC = dadosOrdenados.map((a) => a.fc || null);
     const dataFR = dadosOrdenados.map((a) => a.fr || null);
+    const dataGlicemia = dadosOrdenados.map((a) => a.glicemia || null);
 
     if (chartInstance) {
       chartInstance.destroy();
@@ -187,11 +250,116 @@ document.addEventListener("DOMContentLoaded", () => {
         maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
         scales: {
-          y: { type: "linear", display: true, position: "left", title: { display: true, text: "Temperatura (°C)" } },
-          y1: { type: "linear", display: true, position: "right", title: { display: true, text: "Frequência" }, grid: { drawOnChartArea: false } },
+          y: {
+            type: "linear",
+            display: true,
+            position: "left",
+            title: { display: true, text: "Temperatura (°C)" },
+          },
+          y1: {
+            type: "linear",
+            display: true,
+            position: "right",
+            title: { display: true, text: "Frequência" },
+            grid: { drawOnChartArea: false },
+          },
         },
       },
     });
+
+    // Gráfico de Pressão Arterial
+    const ctxPressao = document.getElementById("graficoPressao");
+    if (ctxPressao) {
+      const dataSistolica = dadosOrdenados.map((a) => {
+        if (!a.pressao || !a.pressao.includes("/")) return null;
+        const val = parseFloat(a.pressao.split("/")[0]);
+        return isNaN(val) ? null : val;
+      });
+
+      const dataDiastolica = dadosOrdenados.map((a) => {
+        if (!a.pressao || !a.pressao.includes("/")) return null;
+        const val = parseFloat(a.pressao.split("/")[1]);
+        return isNaN(val) ? null : val;
+      });
+
+      if (chartPressaoInstance) {
+        chartPressaoInstance.destroy();
+      }
+
+      chartPressaoInstance = new Chart(ctxPressao, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Sistólica (Max)",
+              data: dataSistolica,
+              borderColor: "#dc2626", // Vermelho escuro
+              backgroundColor: "#dc2626",
+              tension: 0.2,
+            },
+            {
+              label: "Diastólica (Min)",
+              data: dataDiastolica,
+              borderColor: "#2563eb", // Azul forte
+              backgroundColor: "#2563eb",
+              tension: 0.2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            y: {
+              type: "linear",
+              display: true,
+              title: { display: true, text: "Pressão (mmHg)" },
+              beginAtZero: false,
+            },
+          },
+        },
+      });
+    }
+
+    // Gráfico de Glicemia
+    const ctxGlicemia = document.getElementById("graficoGlicemia");
+    if (ctxGlicemia) {
+      if (chartGlicemiaInstance) {
+        chartGlicemiaInstance.destroy();
+      }
+
+      chartGlicemiaInstance = new Chart(ctxGlicemia, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Glicemia (mg/dL)",
+              data: dataGlicemia,
+              borderColor: "#eab308", // Amarelo/Dourado
+              backgroundColor: "#eab308",
+              tension: 0.2,
+              yAxisID: "y",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            y: {
+              type: "linear",
+              display: true,
+              position: "left",
+              title: { display: true, text: "Glicemia (mg/dL)" },
+            },
+          },
+        },
+      });
+    }
   }
 
   window.excluirAfericao = function (id) {

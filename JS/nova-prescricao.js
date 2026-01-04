@@ -16,6 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSalvarKit = document.getElementById("btnSalvarKit");
   const btnExcluirKit = document.getElementById("btnExcluirKit");
   const btnImprimir = document.getElementById("btnImprimirReceita");
+  const btnOpenAlergias = document.getElementById("btnOpenAlergias");
+  const modalAlergias = document.getElementById("modalAlergias");
+  const btnCancelAlergias = document.getElementById("btnCancelAlergias");
+  const listaAlergiasModal = document.getElementById("listaAlergiasModal");
 
   // Carregar dados do atendimento para verificar alergias
   const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
@@ -39,6 +43,37 @@ document.addEventListener("DOMContentLoaded", () => {
         .map((t) => t.trim())
         .filter((t) => t.length > 2);
     }
+  }
+
+  // Configuração do Modal de Alergias
+  if (btnOpenAlergias && modalAlergias) {
+    btnOpenAlergias.addEventListener("click", (e) => {
+      e.preventDefault();
+      modalAlergias.classList.remove("hidden");
+
+      if (listaAlergiasModal) {
+        listaAlergiasModal.innerHTML = "";
+        let lista = [];
+        if (atendimento && atendimento.alergias) {
+          lista = atendimento.alergias
+            .split(/[,;]+/)
+            .map((s) => s.trim())
+            .filter((s) => s);
+        }
+
+        lista.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          listaAlergiasModal.appendChild(li);
+        });
+      }
+    });
+  }
+
+  if (btnCancelAlergias && modalAlergias) {
+    btnCancelAlergias.addEventListener("click", () => {
+      modalAlergias.classList.add("hidden");
+    });
   }
 
   // Função para adicionar linha de medicamento

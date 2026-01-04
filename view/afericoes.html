@@ -159,6 +159,70 @@
                   <label for="frAfericao">Frequência Respiratória (mpm)</label>
                   <input type="number" id="frAfericao" placeholder="Ex: 20" />
                 </div>
+                <div class="form-group">
+                  <label for="tpcAfericao">TPC (seg)</label>
+                  <input
+                    type="number"
+                    id="tpcAfericao"
+                    step="0.5"
+                    placeholder="Ex: 2"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="paSistolica">PA Sistólica (Max)</label>
+                  <input type="number" id="paSistolica" placeholder="Ex: 120" />
+                </div>
+                <div class="form-group">
+                  <label for="paDiastolica">PA Diastólica (Min)</label>
+                  <input type="number" id="paDiastolica" placeholder="Ex: 80" />
+                </div>
+                <div class="form-group">
+                  <label for="glicemiaAfericao">Glicemia (mg/dL)</label>
+                  <input
+                    type="number"
+                    id="glicemiaAfericao"
+                    placeholder="Ex: 90"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="mucosasAfericao">Mucosas</label>
+                  <select id="mucosasAfericao">
+                    <option value="">Selecione...</option>
+                    <option value="Róseas">Róseas (Normal)</option>
+                    <option value="Pálidas">Pálidas</option>
+                    <option value="Cianóticas">Cianóticas</option>
+                    <option value="Ictéricas">Ictéricas</option>
+                    <option value="Congestas">Congestas</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="hidratacaoAfericao">Hidratação</label>
+                  <select id="hidratacaoAfericao">
+                    <option value="">Selecione...</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Leve (5%)">Leve (5%)</option>
+                    <option value="Moderada (6-8%)">Moderada (6-8%)</option>
+                    <option value="Grave (>10%)">Grave (>10%)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="conscienciaAfericao">Nível de Consciência</label>
+                  <select id="conscienciaAfericao">
+                    <option value="">Selecione...</option>
+                    <option value="Alerta">Alerta</option>
+                    <option value="Deprimido">Deprimido</option>
+                    <option value="Estupor">Estupor</option>
+                    <option value="Coma">Coma</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="urinaAfericao">Produção de Urina</label>
+                  <input
+                    type="text"
+                    id="urinaAfericao"
+                    placeholder="Ex: Normal, Ausente, Hematúria"
+                  />
+                </div>
                 <div class="form-group full-width">
                   <label for="obsAfericao">Observações</label>
                   <textarea
@@ -175,15 +239,16 @@
 
             <hr class="divider divider-spacing" />
             <h3>Evolução Gráfica</h3>
-            <div
-              style="
-                position: relative;
-                height: 300px;
-                width: 100%;
-                margin-bottom: 20px;
-              "
-            >
+            <div class="grafico-container">
               <canvas id="graficoAfericoes"></canvas>
+            </div>
+            <h3>Evolução Pressão Arterial</h3>
+            <div class="grafico-container">
+              <canvas id="graficoPressao"></canvas>
+            </div>
+            <h3>Evolução Glicemia</h3>
+            <div class="grafico-container">
+              <canvas id="graficoGlicemia"></canvas>
             </div>
             <h3>Histórico de Aferições</h3>
             <div id="listaAfericoes" class="historico-list"></div>

@@ -121,7 +121,7 @@
                   <button
                     type="button"
                     class="btn-ver-alergias"
-                    id="btnOpenAlergiasHeader"
+                    id="btnOpenAlergias"
                   >
                     VER ALERGIAS
                   </button>
@@ -335,6 +335,29 @@
         </div>
       </div>
     </template>
+
+    <!-- Modal de Alergias -->
+    <div id="modalAlergias" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Alergias Cadastradas</h3>
+        <ul id="listaAlergiasModal" class="lista-alergias-modal">
+          <!-- Itens adicionados aparecerão aqui -->
+        </ul>
+        <div
+          class="btn-toolbar"
+          style="margin-top: 1rem; justify-content: flex-end"
+        >
+          <button
+            type="button"
+            id="btnCancelAlergias"
+            class="btn btn-primary"
+            style="width: auto"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <script src="../JS/session-auth.js"></script>
     <script src="../JS/shared.js"></script>

@@ -5,13 +5,6 @@
   const isInViewDir = path.includes("/view/") || path.includes("\\view\\");
 
   // Se não estiver logado e não estiver na página de login, redireciona para login
-  if (!usuario && !isLoginPage) {
-    if (isInViewDir) {
-      window.location.href = "../index.html";
-    } else {
-      window.location.href = "index.html";
-    }
-  }
 
   // Se já estiver logado e tentar acessar a página de login, redireciona para home
   if (usuario && isLoginPage) {

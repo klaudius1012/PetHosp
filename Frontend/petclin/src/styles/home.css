@@ -1,0 +1,16 @@
+
+.btn-editar {
+  background: var(--primary-gradient);
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.btn-excluir {
+  background: var(--error-color);
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.btn {
+  width: 140px;
+}

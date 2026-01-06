@@ -1,0 +1,654 @@
+:root {
+  /* --- Variáveis de Cores e Temas --- */
+  --primary-color: #2dd4bf; /* Verde água */
+  --primary-gradient: linear-gradient(
+    135deg,
+    #2dd4bf 0%,
+    #2e7bf7 100%
+  ); /* Azul-esverdeado */
+
+  --secondary-gradient: linear-gradient(
+    135deg,
+    #2dd4bf 0%,
+    #13418a 100%
+  ); /* Azul-esverdeado escuro */
+  --surface: rgba(255, 255, 255, 0.39); /* Translúcido */
+  --text-color: #374151;
+  --text-muted: #64748b;
+  --border-color: #cbd5e1;
+  --error-color: #ef4444;
+  --bg-overlay: rgba(255, 255, 255, 0.4);
+}
+
+/* --- Configurações Globais e Reset --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: url("../img/fundo_1.png") no-repeat center fixed;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Animações --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Componentes Globais --- */
+.card,
+.login-card {
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: fadeIn 0.8s ease-out;
+  width: 96vw;
+  height: 96vh;
+  max-width: 100%;
+  display: flex;
+}
+
+/* --- Botões --- */
+.btn {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  max-width: 200px;
+}
+
+.btn-primary:hover {
+  background-color: var(--error-color);
+}
+
+.btn-secondary {
+  background: var(--error-color);
+  max-width: 200px;
+}
+
+.btn-neutral {
+  background-color: #6b7280;
+  color: white;
+  max-width: 200px;
+}
+
+.btn-neutral:hover {
+  background-color: #4b5563;
+}
+
+/* --- Botões de Ação Padronizados --- */
+.btn-editar {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-excluir,
+.btn-danger {
+  background-color: var(--error-color);
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-excluir:hover,
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-finalizar {
+  background-color: #10b981; /* Verde Esmeralda */
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* --- Formulários e Inputs --- */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem; /* Espaço para ícone à esquerda */
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  background-color: #fff;
+}
+
+/* --- Wrapper de Input com Ícones --- */
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  padding-right: 2.5rem; /* Espaço para o toggle de senha à direita */
+  padding-left: 2.5rem; /* Espaço para o ícone de cadeado à esquerda */
+}
+
+/* Ícone estático à esquerda */
+.input-icon-left {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  width: 20px;
+}
+
+/* Botão de alternar visibilidade da senha */
+.btn-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.btn-toggle:hover {
+  color: var(--primary-color);
+}
+
+/* --- Ícones de Mostrar/Ocultar Senha --- */
+.icon-eye,
+.icon-eye-off {
+  width: 20px;
+  height: 20px;
+  display: block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-eye {
+  background-image: url("../img/ver-senha.png");
+}
+
+.icon-eye-off {
+  background-image: url("../img/nao-ver-senha.png");
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   CABEÇALHO DA PRESCRIÇÃO
+   ========================================================================== */
+.atendimento-header {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  min-height: 190px;
+  height: auto;
+}
+
+.atendimento-header br {
+  display: none;
+}
+
+.header-main {
+  display: flex;
+  order: 1;
+  flex-direction: column;
+}
+
+.header-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #ddd;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.avatar-placeholder {
+  font-size: 2rem;
+  color: #ccc;
+}
+
+.animal-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.animal-highlight {
+  font-size: 30px;
+  color: #0f766e;
+  margin: 0;
+  font-weight: 900;
+  line-height: 40px;
+}
+
+.animal-age {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.header-info-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 1;
+  order: 2;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-item .label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.info-item .value {
+  font-weight: bold;
+  color: #0f766e;
+}
+
+.alert-item .value {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Header Queixa */
+.queixa-container {
+  display: block;
+  flex-direction: column;
+  margin-top: 1rem;
+  width: 100%;
+  flex-basis: 100%;
+  order: 3;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.animal-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.queixa-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: bold;
+}
+
+.queixa-value {
+  color: #333;
+  margin-left: 0.5rem;
+}
+
+/* ==========================================================================
+   LAYOUT PRINCIPAL (SIDEBAR + CONTEÚDO)
+   ========================================================================== */
+
+.btn-btn-logout {
+  background: var(--surface);
+  position: absolute;
+  top: 3%;
+  right: 3%;
+  width: 70px;
+  height: 30px;
+  border-radius: 10px;
+  margin: 0;
+}
+
+.btn-btn-logout:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* --- Sidebar (Coluna Esquerda) --- */
+.sidebar {
+  width: 250px; /* Largura fixa para a lista */
+  border-right: 1px solid rgba(255, 255, 255, 0.5); /* Divisória sutil */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h3 {
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  margin-top: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sidebar li a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar li:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateX(5px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar li.active {
+  background: rgba(255, 255, 255, 0.6);
+  color: #0f766e; /* Verde escuro para destaque */
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Área de Conteúdo (Coluna Direita) --- */
+.content-area {
+  flex: 1; /* Ocupa o restante do espaço */
+  padding: 3rem;
+  overflow-y: auto; /* Permite rolagem se o texto for longo */
+  color: var(--text-color);
+}
+
+/* --- Responsividade (Mobile) --- */
+.menu-btn {
+  display: none; /* Escondido no desktop */
+  margin-bottom: 1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-color);
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%); /* Esconde a sidebar */
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0); /* Mostra a sidebar */
+  }
+}
+
+/* ============================= */
+/* TABELAS (Estilos Globais)     */
+/* ============================= */
+
+.content-area table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.content-area th,
+.content-area td {
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.content-area th {
+  background: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.content-area td {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-area tr:hover td {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* ============================= */
+/* PAGINAÇÃO (Estilos Globais)   */
+/* ============================= */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color, #ccc);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color, #333);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+/* ============================= */
+/* MODAL (Estilos Globais)       */
+/* ============================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================
+   ESTILOS COMPARTILHADOS (ALERGIAS & ALERTAS)
+   ========================================= */
+
+/* Botão Ver Alergias */
+.btn-ver-alergias {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.btn-blink {
+  background-color: #dc3545;
+  animation: blink 1s infinite;
+}
+
+/* Alerta para parâmetros de triagem fora do normal */
+.info-item.param-alert {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+}
+
+.info-item.param-alert .value {
+  color: #b91c1c;
+  font-weight: bold;
+}

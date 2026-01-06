@@ -652,3 +652,20 @@ button:disabled {
   color: #b91c1c;
   font-weight: bold;
 }
+
+/* --- Ajustes da Recepção --- */
+.search-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.search-container input[type="date"] {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.search-container input[type="search"] {
+  flex: 1;
+}

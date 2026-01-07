@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>Login</title>
-    <link rel="stylesheet" href="CSS/login.css" />
+    <link rel="stylesheet" href="login.css" />
   </head>
   <body>
     <!-- Container Principal: Card de Login  -->
     <main class="login-card card">
       <!-- Seção Esquerda: Identidade Visual e Logo -->
       <section class="login-left">
-        <img src="img/logo.png" alt="Logo PetClin" />
+        <img src="./Frontend/img/logo.png" alt="Logo PetClin" />
         <h1>PetClin</h1>
         <p>Seu portal para o cuidado animal.</p>
       </section>
@@ -30,7 +30,7 @@
             <div class="input-wrapper">
               <input type="text" id="username" required />
               <img
-                src="img/icon-login.png"
+                src="./Frontend/img/icon-login.png"
                 class="input-icon-left"
                 alt="Ícone usuário"
               />
@@ -41,7 +41,7 @@
             <div class="input-wrapper">
               <input type="password" id="password" required />
               <img
-                src="img/icon-cadeado.png"
+                src="./Frontend/img/icon-cadeado.png"
                 class="input-icon-left"
                 alt="Ícone senha"
               />
@@ -66,7 +66,7 @@
       </section>
     </main>
 
-    <script src="JS/session-auth.js"></script>
+    <script src="./Frontend/JS/session-auth.js"></script>
     <script>
       document
         .getElementById("loginForm")
@@ -78,7 +78,7 @@
           if (user && pass) {
             // Salva na sessão (limpa ao fechar o navegador)
             sessionStorage.setItem("usuarioLogado", user);
-            window.location.href = "view/home.html";
+            window.location.href = "./Frontend/view/home.html";
           } else {
             alert("Por favor, preencha usuário e senha.");
           }

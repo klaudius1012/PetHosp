@@ -17,7 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       sessionStorage.removeItem("usuarioLogado");
-      window.location.href = "../index.html";
+      window.location.href = "../../index.html";
+    });
+  }
+
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+      menuBtn.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        sidebar.classList.contains("open") &&
+        !sidebar.contains(event.target) &&
+        !menuBtn.contains(event.target)
+      ) {
+        sidebar.classList.remove("open");
+        menuBtn.classList.remove("open");
+      }
     });
   }
 

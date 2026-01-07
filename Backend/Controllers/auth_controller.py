@@ -1,29 +1,42 @@
-from config.database import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
-
-def criar_usuario(nome, email, senha, clinica_id, tipo):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    senha_hash = generate_password_hash(senha)
-
-    cursor.execute("""
-        INSERT INTO usuarios (nome, email, senha, clinica_id, tipo)
-        VALUES (?, ?, ?, ?, ?)
-    """, (nome, email, senha_hash, clinica_id, tipo))
-
-    conn.commit()
-    conn.close()
+from models.user_model import UserModel
 
 
-def autenticar_usuario(email, senha):
-    conn = get_connection()
-    cursor = conn.cursor()
+class AuthController:
+    """
+    Camada de regras de negócio para autenticação de usuários.
+    """
 
-    cursor.execute("SELECT * FROM usuarios WHERE email = ?", (email,))
-    usuario = cursor.fetchone()
-    conn.close()
+    @staticmethod
+    def register_user(nome, email, senha, clinica_id, tipo):
+        if not nome or not email or not senha:
+            raise ValueError("Nome, email e senha são obrigatórios.")
 
-    if usuario and check_password_hash(usuario["senha"], senha):
+        usuario_existente = UserModel.find_by_email(email)
+        if usuario_existente:
+            raise ValueError("Já existe um usuário com este email.")
+
+        senha_hash = generate_password_hash(senha)
+
+        UserModel.create(
+            nome=nome,
+            email=email,
+            senha=senha_hash,
+            clinica_id=clinica_id,
+            tipo=tipo
+        )
+
+    @staticmethod
+    def authenticate_user(email, senha):
+        if not email or not senha:
+            raise ValueError("Email e senha são obrigatórios.")
+
+        usuario = UserModel.find_by_email(email)
+
+        if not usuario:
+            return None
+
+        if not check_password_hash(usuario["senha"], senha):
+            return None
+
         return usuario
-    return None

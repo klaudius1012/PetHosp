@@ -1,8 +1,15 @@
 import sqlite3
+from pathlib import Path
 
-DB_PATH = "backend/database/petclin.db"
+# Caminho absoluto para o banco de dados
+BASE_DIR = Path(__file__).resolve().parent.parent
+DB_PATH = BASE_DIR / "database" / "petclin.db"
+
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """
+    Retorna uma conexão com o banco de dados SQLite.
+    """
+    connection = sqlite3.connect(DB_PATH)
+    connection.row_factory = sqlite3.Row
+    return connection

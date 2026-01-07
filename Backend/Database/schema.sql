@@ -7,10 +7,11 @@ CREATE TABLE IF NOT EXISTS clinicas (
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     senha TEXT NOT NULL,
-    tipo TEXT CHECK(tipo IN ('admin','medico','atendente')),
+    tipo TEXT CHECK(tipo IN ('admin','medico','atendente')) NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (clinica_id) REFERENCES clinicas(id)
 );

@@ -1,74 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="../CSS/tutores.css" />
+    <link rel="icon" type="image/png" href="../../favicon.png" />
+    <title>Tutores - PetClin</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/header.css" />
+    <link rel="stylesheet" href="../css/table.css" />
   </head>
-
   <body>
-    <main class="login-card card">
-      <!-- Coluna Esquerda: Lista de Serviços -->
-      <aside class="sidebar">
-        <h3>Serviços</h3>
-        <ul id="listaServicos">
-          <li onclick="window.location.href='home.html'">Dashboard</li>
-          <li onclick="window.location.href='agenda.html'">Agenda</li>
-          <li onclick="window.location.href='recepcao.html'">Recepção</li>
-          <li onclick="window.location.href='tutores.html'">Tutores</li>
-          <li onclick="window.location.href='animais.html'">Animais</li>
-          <li onclick="window.location.href='internacao.html'">Internação</li>
-          <li onclick="window.location.href='vacinas.html'">Vacinas</li>
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <img src="../img/logo.png" alt="Logo" class="sidebar-logo" />
+        <span>PetClin</span>
+      </header>
+      <nav>
+        <ul>
+          <li onclick="window.location.href = 'home.html'">🏠 Home</li>
+          <li onclick="window.location.href = 'recepcao.html'">🛎️ Recepção</li>
+          <li onclick="window.location.href = 'agenda.html'">🗓️ Agenda</li>
+          <li onclick="window.location.href = 'internacao.html'">
+            🏥 Internação
+          </li>
+          <li class="active" onclick="window.location.href = 'tutores.html'">
+            👥 Tutores
+          </li>
+          <li onclick="window.location.href = 'animais.html'">🐾 Animais</li>
+          <li onclick="window.location.href = 'estoque.html'">📦 Estoque</li>
+          <li onclick="window.location.href = 'financeiro.html'">
+            💰 Financeiro
+          </li>
+          <li id="logoutBtn">🚪 Sair</li>
         </ul>
-      </aside>
+      </nav>
+    </aside>
 
-      <!-- Coluna Direita: Conteúdo -->
-      <section class="content-area">
-        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
-        <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Tutores -->
-          <article id="view-tutores">
-            <h2>Tutores Cadastrados</h2>
-            <div class="form-group">
-              <input
-                type="search"
-                id="buscaTutor"
-                placeholder="Buscar por nome ou CPF..."
-              />
-            </div>
-            <button
-              class="btn btn-primary"
-              onclick="window.location.href='cadastro_tutor.html'"
-            >
-              Cadastrar Novo Tutor
-            </button>
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>Telefone</th>
-                  <th>Cidade</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-tutores">
-                <!-- Preenchido via JS -->
-              </tbody>
-            </table>
-            <div id="pagination" class="pagination"></div>
-          </article>
+    <main class="main-content">
+      <header class="main-header">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <h1>Tutores</h1>
+      </header>
+
+      <div class="content-body">
+        <div class="toolbar">
+          <input type="text" id="buscaTutor" placeholder="Buscar tutor..." />
+          <button
+            class="btn-primary"
+            onclick="window.location.href = 'novo-tutor.html'"
+          >
+            + Novo Tutor
+          </button>
         </div>
-      </section>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Telefone</th>
+                <th>Email</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-tutores"></tbody>
+          </table>
+        </div>
+      </div>
     </main>
-
-    <!-- Botão de Logout -->
-    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
-
-    <!-- JS -->
-    <script src="../JS/session-auth.js"></script>
-    <script src="../JS/pagination.js"></script>
-    <script src="../JS/tutores.js"></script>
+    <script src="../js/session-auth.js"></script>
+    <script src="../js/tutores.js"></script>
   </body>
 </html>

@@ -1,53 +1,8 @@
-# Pendências do Backend - PetClin
+## Pendências Resolvidas
 
-Este arquivo lista as funcionalidades e rotas de API que precisam ser implementadas no backend para que o sistema frontend funcione completamente com um banco de dados real.
+- [x] **Correção de Rotas (Tutores e Veterinários):** As rotas foram corrigidas para remover prefixos duplicados, evitando URLs como `/tutores/tutores`.
+- [x] **Padronização de Banco de Dados:** O módulo de Tutores foi refatorado para usar `sqlite3`, padronizando o acesso ao banco de dados com os outros módulos.
 
-## 1. Módulo de Autenticação e Autorização
+## Próximos Passos (Sugestão)
 
-O frontend já prevê o tratamento de status `401 (Unauthorized)`, indicando a necessidade de um sistema de login.
-
-- [x] **Implementar sistema de login:** Criar rota `POST /login` que recebe credenciais (usuário/senha) e retorna um token (JWT) ou inicia uma sessão.
-- [x] **Proteger Rotas:** Implementar um middleware que valide o token/sessão em todas as rotas que necessitam de autenticação.
-- [x] **Associar Usuário Logado:** A maioria das ações (criar atendimento, prescrição, etc.) deve ser associada ao veterinário/usuário logado. O backend deve extrair o ID do usuário do token/sessão.
-
-## 2. Módulo de Tutores
-
-A listagem e exclusão parecem funcionar. A edição precisa ser implementada.
-
-- [x] **Rota `GET /tutores/:id`:** Criar endpoint para buscar os dados de um único tutor pelo seu ID. Essencial para a página "editar-tutor.html".
-- [x] **Rota `PUT /tutores/:id`:** Criar endpoint para receber dados e atualizar um tutor existente no banco de dados.
-
-## 3. Módulo de Animais
-
-A listagem funciona, mas pode ser otimizada. A edição e exclusão precisam ser implementadas.
-
-- [x] **Rota `GET /animais/:id`:** Criar endpoint para buscar os dados de um único animal pelo seu ID. Essencial para a página "editar-pet.html".
-- [x] **Rota `PUT /animais/:id`:** Criar endpoint para atualizar os dados de um animal (nome, raça, alergias, vacinas, etc.). Usado tanto na edição do pet quanto na atualização de alergias/vacinas na tela de novo atendimento.
-
-## 4. Módulo Financeiro
-
-A criação, listagem, edição e exclusão estão funcionais.
-
-## 5. Módulo de Atendimentos e Internação
-
-O fluxo principal de criação e listagem está funcional. A edição completa e a agregação de dados para impressão precisam de atenção.
-
-- [x] **Rota `PUT /atendimentos/:id` (Completa):** A rota atual parece apenas atualizar o status. É preciso expandi-la (ou garantir que ela suporte) para atualizar todos os campos de um atendimento (sinais vitais, queixa, etc.), o que é necessário para a página "editar-atendimento.html".
-- [x] **Modelos e Rotas para Dados Associados:** Para a funcionalidade de impressão de histórico completo (`imprimirPrescricao` em `prescricao.js`), é necessário criar os modelos no banco de dados e as respectivas rotas de API para:
-    - [x] **Evoluções Clínicas:** `GET /evolucoes?atendimento_id=<id>`
-    - [x] **Exames Solicitados:** `GET /exames?atendimento_id=<id>`
-    - [x] **Procedimentos Realizados:** `GET /procedimentos?atendimento_id=<id>`
-    - [x] **Aferições de Sinais Vitais:** `GET /afericoes?atendimento_id=<id>`
-
-## 6. Módulo de Veterinários
-
-O sistema assume a existência de veterinários, mas não há como gerenciá-los.
-
-- [x] **Modelo `Veterinario` no BD:** Criar a tabela/coleção para armazenar os dados dos veterinários.
-- [x] **Rotas CRUD para Veterinários:** `GET /veterinarios`, `POST /veterinarios`, `GET /veterinarios/:id`, `PUT /veterinarios/:id`, `DELETE /veterinarios/:id`.
-
-## 7. Estrutura do Banco de Dados
-
-- [x] **Definir e Criar Todas as Tabelas:** Criar o schema do banco de dados com todas as tabelas mencionadas (`usuarios`, `veterinarios`, `tutores`, `animais`, `atendimentos`, `prescricoes`, `kits_prescricao`, `lancamentos_financeiros`, `evolucoes`, `exames`, `procedimentos`, `afericoes`).
-- [x] **Definir Relacionamentos:** Estabelecer as chaves estrangeiras e relacionamentos corretos entre as tabelas.
-- [x] **Módulo de Prescrições:** Criar rotas e tabelas para gerenciar receitas e kits de prescrição.
+- [x] **Verificação de Arquivos de Frontend:** Arquivos HTML referenciados no menu (`home.html`, `tutores.html`, `animais.html`, `recepcao.html`, `agenda.html`, `estoque.html`, `financeiro.html`) foram criados na pasta `frontend/view`.

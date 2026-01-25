@@ -1,153 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agenda</title>
-    <link rel="stylesheet" href="../CSS/agenda.css" />
+    <link rel="icon" type="image/png" href="../../favicon.png" />
+    <title>Agenda - PetClin</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/header.css" />
+    <link rel="stylesheet" href="../css/table.css" />
   </head>
   <body>
-    <main class="login-card card">
-      <!-- Coluna Esquerda: Lista de Serviços -->
-      <aside class="sidebar">
-        <h3>Serviços</h3>
-        <ul id="listaServicos">
-          <li onclick="window.location.href='home.html'">Dashboard</li>
-          <li onclick="window.location.href='agenda.html'">Agenda</li>
-          <li onclick="window.location.href='recepcao.html'">Recepção</li>
-          <li onclick="window.location.href='tutores.html'">Tutores</li>
-          <li onclick="window.location.href='animais.html'">Animais</li>
-          <li onclick="window.location.href='internacao.html'">Internação</li>
-          <li onclick="window.location.href='vacinas.html'">Vacinas</li>
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <img src="../img/logo.png" alt="Logo" class="sidebar-logo" />
+        <span>PetClin</span>
+      </header>
+      <nav>
+        <ul>
+          <li onclick="window.location.href = 'home.html'">🏠 Home</li>
+          <li onclick="window.location.href = 'recepcao.html'">🛎️ Recepção</li>
+          <li class="active" onclick="window.location.href = 'agenda.html'">
+            🗓️ Agenda
+          </li>
+          <li onclick="window.location.href = 'internacao.html'">
+            🏥 Internação
+          </li>
+          <li onclick="window.location.href = 'tutores.html'">👥 Tutores</li>
+          <li onclick="window.location.href = 'animais.html'">🐾 Animais</li>
+          <li onclick="window.location.href = 'estoque.html'">📦 Estoque</li>
+          <li onclick="window.location.href = 'financeiro.html'">
+            💰 Financeiro
+          </li>
+          <li id="logoutBtn">🚪 Sair</li>
         </ul>
-      </aside>
+      </nav>
+    </aside>
 
-      <!-- Coluna Direita: Conteúdo -->
-      <section class="content-area">
-        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
-        <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Agenda -->
-          <article id="view-agenda">
-            <h2>Agenda do Dia</h2>
-            <div class="form-group">
-              <input
-                type="search"
-                id="buscaAgenda"
-                placeholder="Buscar por animal ou tutor..."
-              />
-            </div>
-            <button id="btnNovoAgendamento" class="btn btn-primary">
-              Novo Agendamento
-            </button>
-            <table>
-              <thead>
-                <tr>
-                  <th>Tutor</th>
-                  <th>Telefone</th>
-                  <th>Animal</th>
-                  <th>Hora</th>
-                  <th>Espécie</th>
-                  <th>Veterinário</th>
-                  <th>Tipo</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-agenda">
-                <!-- Preenchido via JS -->
-              </tbody>
-            </table>
-            <div id="pagination" class="pagination"></div>
-          </article>
+    <main class="main-content">
+      <header class="main-header">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <h1>Agenda</h1>
+      </header>
+
+      <div class="content-body">
+        <div class="toolbar">
+          <input type="date" id="dataAgenda" />
+          <button
+            class="btn-primary"
+            onclick="window.location.href = 'novo-agendamento.html'"
+          >
+            + Agendar
+          </button>
         </div>
-      </section>
-    </main>
 
-    <!-- Modal de Novo Agendamento -->
-    <div id="modalAgendamento" class="modal-overlay hidden">
-      <div class="modal-content">
-        <h2>Novo Agendamento</h2>
-        <form id="formAgendamento">
-          <div class="form-group">
-            <label for="agendaHora">Hora</label>
-            <input type="time" id="agendaHora" required />
-          </div>
-          <div class="form-group">
-            <label for="agendaAnimal">Nome do Animal</label>
-            <input
-              type="text"
-              id="agendaAnimal"
-              list="listaAnimaisAgenda"
-              required
-              placeholder="Ex: Rex"
-            />
-            <datalist id="listaAnimaisAgenda"></datalist>
-          </div>
-          <div class="form-group">
-            <label for="agendaEspecie">Espécie</label>
-            <input
-              type="text"
-              id="agendaEspecie"
-              placeholder="Ex: Cachorro, Gato"
-            />
-          </div>
-          <div class="form-group">
-            <label for="agendaTutor">Nome do Tutor</label>
-            <input
-              type="text"
-              id="agendaTutor"
-              list="listaTutoresAgenda"
-              required
-              placeholder="Ex: Ana Silva"
-            />
-            <datalist id="listaTutoresAgenda"></datalist>
-          </div>
-          <div class="form-group">
-            <label for="agendaTelefone">Telefone</label>
-            <input
-              type="tel"
-              id="agendaTelefone"
-              placeholder="(00) 00000-0000"
-            />
-          </div>
-          <div class="form-group">
-            <label for="agendaVet">Veterinário</label>
-            <input
-              type="text"
-              id="agendaVet"
-              required
-              placeholder="Ex: Dr. João"
-            />
-          </div>
-          <div class="form-group">
-            <label for="agendaTipo">Tipo de Atendimento</label>
-            <select id="agendaTipo" required>
-              <option value="Consulta">Consulta</option>
-              <option value="Vacina">Vacina</option>
-              <option value="Retorno">Retorno</option>
-              <option value="Exame">Exame</option>
-              <option value="Cirurgia">Cirurgia</option>
-            </select>
-          </div>
-          <div class="btn-toolbar">
-            <button
-              type="button"
-              id="btnCancelarAgenda"
-              class="btn btn-secondary"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary">Salvar</button>
-          </div>
-        </form>
+        <div class="table-container">
+          <!-- Placeholder para calendário ou lista -->
+          <p style="text-align: center; padding: 20px; color: #666">
+            Funcionalidade de agenda em desenvolvimento.
+          </p>
+        </div>
       </div>
-    </div>
-
-    <!-- Botão de Logout -->
-    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
-
-    <!-- JS -->
-    <script src="../JS/session-auth.js"></script>
-    <script src="../JS/pagination.js"></script>
-    <script src="../JS/agenda.js"></script>
+    </main>
+    <script src="../js/session-auth.js"></script>
+    <!-- <script src="../js/agenda.js"></script> -->
   </body>
 </html>

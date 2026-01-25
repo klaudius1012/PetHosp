@@ -4,7 +4,7 @@ import sqlite3
 evolucao_bp = Blueprint('evolucao_bp', __name__)
 
 def get_db_connection():
-    conn = sqlite3.connect('database/petclin.db')
+    conn = sqlite3.connect('backend/database/petclin.db')
     conn.row_factory = sqlite3.Row
     return conn
 

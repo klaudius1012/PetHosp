@@ -8,14 +8,14 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-@veterinarios_bp.route('/veterinarios', methods=['GET'])
+@veterinarios_bp.route('/', methods=['GET'])
 def get_veterinarios():
     conn = get_db_connection()
     veterinarios = conn.execute('SELECT * FROM veterinarios').fetchall()
     conn.close()
     return jsonify([dict(row) for row in veterinarios])
 
-@veterinarios_bp.route('/veterinarios', methods=['POST'])
+@veterinarios_bp.route('/', methods=['POST'])
 def create_veterinario():
     data = request.json
     conn = get_db_connection()
@@ -33,7 +33,7 @@ def create_veterinario():
         conn.close()
         return jsonify({'error': str(e)}), 500
 
-@veterinarios_bp.route('/veterinarios/<int:id>', methods=['GET'])
+@veterinarios_bp.route('/<int:id>', methods=['GET'])
 def get_veterinario(id):
     conn = get_db_connection()
     veterinario = conn.execute('SELECT * FROM veterinarios WHERE id = ?', (id,)).fetchone()
@@ -42,7 +42,7 @@ def get_veterinario(id):
         return jsonify({'error': 'Veterinário não encontrado'}), 404
     return jsonify(dict(veterinario))
 
-@veterinarios_bp.route('/veterinarios/<int:id>', methods=['PUT'])
+@veterinarios_bp.route('/<int:id>', methods=['PUT'])
 def update_veterinario(id):
     data = request.json
     conn = get_db_connection()
@@ -55,7 +55,7 @@ def update_veterinario(id):
     conn.close()
     return jsonify(dict(veterinario))
 
-@veterinarios_bp.route('/veterinarios/<int:id>', methods=['DELETE'])
+@veterinarios_bp.route('/<int:id>', methods=['DELETE'])
 def delete_veterinario(id):
     conn = get_db_connection()
     conn.execute('DELETE FROM veterinarios WHERE id = ?', (id,))

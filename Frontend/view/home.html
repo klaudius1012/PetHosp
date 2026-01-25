@@ -1,48 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="../CSS/home.css" />
+    <link rel="icon" type="image/png" href="../../favicon.png" />
+    <title>Home - PetClin</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/header.css" />
+    <style>
+      .dashboard-cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 200px;
+      }
+      .card h3 {
+        margin-top: 0;
+        color: #555;
+      }
+      .card .number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+    </style>
   </head>
-
   <body>
-    <main class="login-card card">
-      <!-- Coluna Esquerda: Lista de Serviços -->
-      <aside class="sidebar">
-        <h3>Serviços</h3>
-        <ul id="listaServicos">
-          <li onclick="window.location.href='home.html'">Dashboard</li>
-          <li onclick="window.location.href='agenda.html'">Agenda</li>
-          <li onclick="window.location.href='recepcao.html'">Recepção</li>
-          <li onclick="window.location.href='tutores.html'">Tutores</li>
-          <li onclick="window.location.href='animais.html'">Animais</li>
-          <li onclick="window.location.href='internacao.html'">Internação</li>
-          <li onclick="window.location.href='vacinas.html'">Vacinas</li>
-          <li onclick="window.location.href='financeiro.html'">Financeiro</li>
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <img src="../img/logo.png" alt="Logo" class="sidebar-logo" />
+        <span>PetClin</span>
+      </header>
+      <nav>
+        <ul>
+          <li class="active" onclick="window.location.href = 'home.html'">
+            🏠 Home
+          </li>
+          <li onclick="window.location.href = 'recepcao.html'">🛎️ Recepção</li>
+          <li onclick="window.location.href = 'agenda.html'">🗓️ Agenda</li>
+          <li onclick="window.location.href = 'internacao.html'">
+            🏥 Internação
+          </li>
+          <li onclick="window.location.href = 'tutores.html'">👥 Tutores</li>
+          <li onclick="window.location.href = 'animais.html'">🐾 Animais</li>
+          <li onclick="window.location.href = 'estoque.html'">📦 Estoque</li>
+          <li onclick="window.location.href = 'financeiro.html'">
+            💰 Financeiro
+          </li>
+          <li id="logoutBtn">🚪 Sair</li>
         </ul>
-      </aside>
+      </nav>
+    </aside>
 
-      <!-- Coluna Direita: Conteúdo -->
-      <section class="content-area">
-        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
-        <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Dashboard -->
-          <article id="view-dashboard">
-            <h2>Dashboard</h2>
-            <p>Bem-vindo ao sistema PetClin.</p>
-            <p>Selecione um módulo no menu ao lado.</p>
-          </article>
+    <main class="main-content">
+      <header class="main-header">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <h1>Dashboard</h1>
+      </header>
+
+      <div class="content-body">
+        <div class="dashboard-cards">
+          <div class="card">
+            <h3>Atendimentos Hoje</h3>
+            <div class="number">0</div>
+          </div>
+          <div class="card">
+            <h3>Internados</h3>
+            <div class="number">0</div>
+          </div>
         </div>
-      </section>
+      </div>
     </main>
-
-    <!-- Botão de Logout -->
-    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
-
-    <!-- JS -->
-    <script src="../JS/session-auth.js"></script>
-    <script src="../JS/home.js"></script>
+    <script src="../js/session-auth.js"></script>
   </body>
 </html>

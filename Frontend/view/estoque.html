@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="../../favicon.png" />
-    <title>Internação - PetClin</title>
+    <title>Estoque - PetClin</title>
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="../css/sidebar.css" />
     <link rel="stylesheet" href="../css/header.css" />
@@ -21,12 +21,14 @@
           <li onclick="window.location.href = 'home.html'">🏠 Home</li>
           <li onclick="window.location.href = 'recepcao.html'">🛎️ Recepção</li>
           <li onclick="window.location.href = 'agenda.html'">🗓️ Agenda</li>
-          <li class="active" onclick="window.location.href = 'internacao.html'">
+          <li onclick="window.location.href = 'internacao.html'">
             🏥 Internação
           </li>
           <li onclick="window.location.href = 'tutores.html'">👥 Tutores</li>
           <li onclick="window.location.href = 'animais.html'">🐾 Animais</li>
-          <li onclick="window.location.href = 'estoque.html'">📦 Estoque</li>
+          <li class="active" onclick="window.location.href = 'estoque.html'">
+            📦 Estoque
+          </li>
           <li onclick="window.location.href = 'financeiro.html'">
             💰 Financeiro
           </li>
@@ -38,35 +40,33 @@
     <main class="main-content">
       <header class="main-header">
         <button id="menuBtn" class="menu-btn">☰</button>
-        <h1>Internação</h1>
+        <h1>Estoque</h1>
       </header>
 
       <div class="content-body">
         <div class="toolbar">
           <input
             type="text"
-            id="buscaInternacao"
-            placeholder="Buscar por animal ou tutor..."
+            id="buscaProduto"
+            placeholder="Buscar produto..."
           />
+          <button
+            class="btn-primary"
+            onclick="window.location.href = 'novo-produto.html'"
+          >
+            + Novo Produto
+          </button>
         </div>
 
         <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Animal</th>
-                <th>Tutor</th>
-                <th>Data de Entrada</th>
-                <th>Veterinário</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-internacao"></tbody>
-          </table>
+          <!-- Placeholder -->
+          <p style="text-align: center; padding: 20px; color: #666">
+            Gestão de estoque em desenvolvimento.
+          </p>
         </div>
       </div>
     </main>
     <script src="../js/session-auth.js"></script>
-    <script src="../js/internacao.js"></script>
+    <!-- <script src="../js/estoque.js"></script> -->
   </body>
 </html>

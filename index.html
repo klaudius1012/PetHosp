@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -24,10 +24,15 @@
         </header>
         <form id="loginForm">
           <div class="form-group">
-            <label for="username">Usuário</label>
+            <label for="username">Email</label>
 
             <div class="input-wrapper">
-              <input type="text" id="username" required />
+              <input
+                type="email"
+                id="username"
+                required
+                placeholder="admin@petclin.com"
+              />
               <img
                 src="./frontend/img/icon-login.png"
                 class="input-icon-left"
@@ -69,17 +74,33 @@
     <script>
       document
         .getElementById("loginForm")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
-          const user = document.getElementById("username").value;
-          const pass = document.getElementById("password").value;
+          const email = document.getElementById("username").value;
+          const senha = document.getElementById("password").value;
 
-          if (user && pass) {
-            // Salva na sessão (limpa ao fechar o navegador)
-            sessionStorage.setItem("usuarioLogado", user);
-            window.location.href = "./frontend/view/home.html";
+          if (email && senha) {
+            try {
+              const response = await fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, senha }),
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                sessionStorage.setItem("usuarioLogado", data.user.nome);
+                window.location.href = "./frontend/view/home.html";
+              } else {
+                const err = await response.json();
+                alert(err.error || "Login inválido");
+              }
+            } catch (error) {
+              console.error(error);
+              alert("Erro de conexão com o servidor.");
+            }
           } else {
-            alert("Por favor, preencha usuário e senha.");
+            alert("Por favor, preencha email e senha.");
           }
         });
     </script>

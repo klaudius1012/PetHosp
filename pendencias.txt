@@ -1,8 +1,0 @@
-## Pendências Resolvidas
-
-- [x] **Correção de Rotas (Tutores e Veterinários):** As rotas foram corrigidas para remover prefixos duplicados, evitando URLs como `/tutores/tutores`.
-- [x] **Padronização de Banco de Dados:** O módulo de Tutores foi refatorado para usar `sqlite3`, padronizando o acesso ao banco de dados com os outros módulos.
-
-## Próximos Passos (Sugestão)
-
-- [x] **Verificação de Arquivos de Frontend:** Arquivos HTML referenciados no menu (`home.html`, `tutores.html`, `animais.html`, `recepcao.html`, `agenda.html`, `estoque.html`, `financeiro.html`) foram criados na pasta `frontend/view`.

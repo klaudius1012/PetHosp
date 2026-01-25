@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("formPet");
   form.noValidate = true; // Desabilita validação nativa para usar a customizada
   const inputNascimento = document.getElementById("nascimento");
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputNomeVacina = document.getElementById("inputNomeVacina");
   const inputDataVacina = document.getElementById("inputDataVacina");
   const inputDataRevacinaItem = document.getElementById(
-    "inputDataRevacinaItem"
+    "inputDataRevacinaItem",
   );
   const btnAddVacinaItem = document.getElementById("btnAddVacinaItem");
   const listaVacinasModal = document.getElementById("listaVacinasModal");
@@ -33,11 +33,29 @@ document.addEventListener("DOMContentLoaded", () => {
   let vacinasTemp = [];
 
   // Carregar Tutores para o Datalist
-  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
+  let tutores = [];
   const datalist = document.getElementById("listaTutores");
 
-  // Ordena tutores alfabeticamente
-  tutores.sort((a, b) => a.nome.localeCompare(b.nome));
+  async function carregarTutores() {
+    try {
+      const response = await fetch("/tutores");
+      if (response.ok) {
+        tutores = await response.json();
+        tutores.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        datalist.innerHTML = "";
+        tutores.forEach((t) => {
+          const option = document.createElement("option");
+          option.value = t.nome;
+          option.textContent = `CPF: ${t.cpf || ""}`;
+          datalist.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar tutores:", error);
+    }
+  }
+  carregarTutores();
 
   // Remove classe de erro ao digitar/selecionar
   const inputs = form.querySelectorAll("input, select");
@@ -45,13 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("input", () => {
       input.classList.remove("input-error");
     });
-  });
-
-  tutores.forEach((t) => {
-    const option = document.createElement("option");
-    option.value = t.nome;
-    option.textContent = `CPF: ${t.cpf}`;
-    datalist.appendChild(option);
   });
 
   // Lógica da Foto (Preview e Base64)
@@ -107,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Salvar Pet no "Banco de Dados" (localStorage)
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     let isValid = true;
@@ -136,9 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const novoPet = {
-      id: "PET" + Date.now(),
-      tutorId: tutorObj.id,
-      tutorNome: tutorObj.nome,
+      tutor_id: tutorObj.id,
       nome: document.getElementById("nome").value,
       especie: document.getElementById("especie").value,
       raca: document.getElementById("raca").value,
@@ -146,7 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
       nascimento: document.getElementById("nascimento").value,
       peso: document.getElementById("peso").value,
       porte: document.getElementById("porte").value,
-      condicaoReprodutiva: document.getElementById("condicaoReprodutiva").value,
+      condicao_reprodutiva: document.getElementById("condicaoReprodutiva")
+        .value,
       alergias: document.getElementById("alergias").value,
       vacinacao: document.getElementById("vacinacao").value, // Novo campo
       ambiente: document.getElementById("ambiente").value, // Novo campo
@@ -155,12 +165,24 @@ document.addEventListener("DOMContentLoaded", () => {
       foto: fotoBase64,
     };
 
-    const animais = JSON.parse(localStorage.getItem("animais")) || [];
-    animais.push(novoPet);
-    localStorage.setItem("animais", JSON.stringify(animais));
+    try {
+      const response = await fetch("/animais", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(novoPet),
+      });
 
-    alert("Pet cadastrado com sucesso!");
-    window.location.href = "animais.html";
+      if (response.ok) {
+        alert("Pet cadastrado com sucesso!");
+        window.location.href = "animais.html";
+      } else {
+        const err = await response.json();
+        alert("Erro ao cadastrar: " + (err.error || "Erro desconhecido"));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erro de conexão.");
+    }
   });
 
   // --- Lógica do Modal de Alergias ---

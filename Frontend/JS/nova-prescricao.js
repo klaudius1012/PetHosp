@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const atendimentoId = params.get("id");
 
@@ -22,27 +22,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const listaAlergiasModal = document.getElementById("listaAlergiasModal");
 
   // Carregar dados do atendimento para verificar alergias
-  const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-  const atendimento = atendimentos.find((a) => a.id === atendimentoId);
+  let atendimento = null;
   let termosAlergia = [];
 
-  if (atendimento && atendimento.alergias) {
-    const alergiasTexto = atendimento.alergias.toLowerCase();
-    const termosIgnorados = [
-      "não",
-      "nao",
-      "nenhuma",
-      "nenhum",
-      "--",
-      "",
-      "negativo",
-    ];
-    if (!termosIgnorados.includes(alergiasTexto.trim())) {
-      termosAlergia = alergiasTexto
-        .split(/[,;]+/)
-        .map((t) => t.trim())
-        .filter((t) => t.length > 2);
+  try {
+    const res = await fetch(`/atendimentos/${atendimentoId}`);
+    if (res.ok) {
+      atendimento = await res.json();
+      if (atendimento.alergias) {
+        const alergiasTexto = atendimento.alergias.toLowerCase();
+        const termosIgnorados = ["não", "nao", "nenhuma", "nenhum", "--", "", "negativo"];
+        if (!termosIgnorados.includes(alergiasTexto.trim())) {
+          termosAlergia = alergiasTexto
+            .split(/[,;]+/)
+            .map((t) => t.trim())
+            .filter((t) => t.length > 2);
+        }
+      }
+      // Preencher header de impressão
+      document.getElementById("headerAnimalNome").textContent = atendimento.animal_nome || atendimento.animal;
+      document.getElementById("headerTutor").textContent = atendimento.tutor_nome || atendimento.tutor;
     }
+  } catch (e) {
+    console.error("Erro ao carregar atendimento", e);
   }
 
   // Configuração do Modal de Alergias
@@ -175,10 +177,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const isViewMode = params.get("view") === "true";
 
   if (prescricaoId) {
-    const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-    const prescricao = prescricoes.find((p) => p.id === prescricaoId);
-
-    if (prescricao) {
+    try {
+      const res = await fetch(`/prescricoes/${prescricaoId}`);
+      if (res.ok) {
+        const prescricao = await res.json();
       // Preenche os medicamentos
       prescricao.medicamentos.forEach((med) => addMedicamentoRow(med));
       // Preenche observações
@@ -206,6 +208,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const removeBtns = container.querySelectorAll(".btn-remove-item");
         removeBtns.forEach((btn) => (btn.style.display = "none"));
       }
+      }
+    } catch (e) {
+      console.error("Erro ao carregar prescrição", e);
     }
   } else {
     // Adiciona uma linha inicial apenas se for nova prescrição
@@ -216,22 +221,25 @@ document.addEventListener("DOMContentLoaded", () => {
   btnAdd.addEventListener("click", addMedicamentoRow);
 
   // --- Lógica de Kits / Modelos ---
-  function carregarListaKits() {
-    const kits = JSON.parse(localStorage.getItem("prescricao_kits")) || [];
-    selectKit.innerHTML = '<option value="">Selecione um modelo...</option>';
-
-    kits.sort((a, b) => a.nome.localeCompare(b.nome));
-
-    kits.forEach((kit) => {
-      const option = document.createElement("option");
-      option.value = kit.id;
-      option.textContent = kit.nome;
-      selectKit.appendChild(option);
-    });
+  async function carregarListaKits() {
+    try {
+      const res = await fetch('/prescricoes/kits');
+      const kits = await res.json();
+      
+      selectKit.innerHTML = '<option value="">Selecione um modelo...</option>';
+      kits.forEach((kit) => {
+        const option = document.createElement("option");
+        option.value = kit.id;
+        option.textContent = kit.nome;
+        // Armazena dados no elemento para evitar novo fetch
+        option.dataset.medicamentos = JSON.stringify(kit.medicamentos);
+        selectKit.appendChild(option);
+      });
+    } catch (e) { console.error(e); }
   }
 
   if (btnSalvarKit) {
-    btnSalvarKit.addEventListener("click", () => {
+    btnSalvarKit.addEventListener("click", async () => {
       const medicamentos = [];
       const wrappers = container.querySelectorAll(".medicamento-wrapper");
 
@@ -269,29 +277,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const nomeKit = prompt("Nome do Kit / Modelo (ex: Otite Canina):");
       if (nomeKit) {
-        const kits = JSON.parse(localStorage.getItem("prescricao_kits")) || [];
-        const novoKit = {
-          id: Date.now().toString(),
-          nome: nomeKit,
-          medicamentos: medicamentos,
-        };
-        kits.push(novoKit);
-        localStorage.setItem("prescricao_kits", JSON.stringify(kits));
-        alert("Kit salvo com sucesso!");
-        carregarListaKits();
+        try {
+          const res = await fetch('/prescricoes/kits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nomeKit, medicamentos })
+          });
+          if (res.ok) {
+            alert("Kit salvo com sucesso!");
+            carregarListaKits();
+          }
+        } catch (e) {
+          alert("Erro ao salvar kit.");
+        }
       }
     });
   }
 
   if (btnCarregarKit) {
     btnCarregarKit.addEventListener("click", () => {
-      const kitId = selectKit.value;
-      if (!kitId) return;
+      const selectedOption = selectKit.options[selectKit.selectedIndex];
+      if (!selectedOption.value) return;
 
-      const kits = JSON.parse(localStorage.getItem("prescricao_kits")) || [];
-      const kit = kits.find((k) => k.id === kitId);
+      const kit = {
+        nome: selectedOption.textContent,
+        medicamentos: JSON.parse(selectedOption.dataset.medicamentos || "[]")
+      };
 
-      if (kit) {
+      if (kit && kit.medicamentos.length > 0) {
         if (
           confirm(
             `Deseja carregar o kit "${kit.nome}"? Isso adicionará os medicamentos à lista atual.`
@@ -304,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (btnExcluirKit) {
-    btnExcluirKit.addEventListener("click", () => {
+    btnExcluirKit.addEventListener("click", async () => {
       const kitId = selectKit.value;
       if (!kitId) {
         alert("Selecione um modelo para excluir.");
@@ -314,11 +327,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         confirm("Tem certeza que deseja excluir este modelo de prescrição?")
       ) {
-        let kits = JSON.parse(localStorage.getItem("prescricao_kits")) || [];
-        kits = kits.filter((k) => k.id !== kitId);
-        localStorage.setItem("prescricao_kits", JSON.stringify(kits));
-        alert("Modelo excluído com sucesso!");
-        carregarListaKits();
+        try {
+          const res = await fetch(`/prescricoes/kits/${kitId}`, { method: 'DELETE' });
+          if (res.ok) {
+            alert("Modelo excluído com sucesso!");
+            carregarListaKits();
+          }
+        } catch (e) { alert("Erro ao excluir."); }
       }
     });
   }
@@ -355,13 +370,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const nomeAnimal = document
-        .getElementById("headerAnimalNome")
-        .textContent.trim();
-      const nomeTutor = document
-        .getElementById("headerTutor")
-        .textContent.trim();
-      const veterinario = atendimento ? atendimento.veterinario : "Veterinário";
+      const nomeAnimal = document.getElementById("headerAnimalNome").textContent.trim();
+      const nomeTutor = document.getElementById("headerTutor").textContent.trim();
+      // Tenta pegar nome do veterinário do atendimento carregado ou da sessão (não temos acesso direto à sessão aqui, então usa placeholder)
+      const veterinario = atendimento 
+        ? (atendimento.veterinario_nome || atendimento.veterinario || "Veterinário") 
+        : "Veterinário";
+        
       const observacoes = document.getElementById("observacoes").value;
 
       const janelaImpressao = window.open("", "_blank");
@@ -466,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     salvarPrescricao();
   });
 
-  function salvarPrescricao() {
+  async function salvarPrescricao() {
     const medicamentos = [];
     const wrappers = container.querySelectorAll(".medicamento-wrapper");
     let erro = false;
@@ -541,21 +556,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const observacoes = document.getElementById("observacoes").value;
 
     const novaPrescricao = {
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-      atendimentoId: atendimentoId,
-      data: new Date().toISOString(),
-      veterinario: atendimento ? atendimento.veterinario : "Veterinário",
+      atendimento_id: atendimentoId,
       medicamentos: medicamentos,
       observacoes: observacoes,
     };
 
-    // Salvar no localStorage
-    const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-    prescricoes.push(novaPrescricao);
-    localStorage.setItem("prescricoes", JSON.stringify(prescricoes));
-
-    alert("Prescrição salva com sucesso!");
-    window.location.href = `prescricao.html?id=${atendimentoId}`;
+    try {
+      const res = await fetch('/prescricoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novaPrescricao)
+      });
+      if (res.ok) {
+        alert("Prescrição salva com sucesso!");
+        window.location.href = `prescricao.html?id=${atendimentoId}`;
+      } else { alert("Erro ao salvar."); }
+    } catch (e) { alert("Erro de conexão."); }
   }
 
   function sugerirAlternativas(termoAlergia) {

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Financeiro - PetClin</title>
+    <link rel="stylesheet" href="../css/financeiro.css" />
+  </head>
+  <body>
+    <main class="login-card card">
+      <aside class="sidebar">
+        <h3>Serviços</h3>
+        <ul id="listaServicos">
+          <li onclick="window.location.href = 'home.html'">Dashboard</li>
+          <li onclick="window.location.href = 'agenda.html'">Agenda</li>
+          <li onclick="window.location.href = 'recepcao.html'">Recepção</li>
+          <li onclick="window.location.href = 'tutores.html'">Tutores</li>
+          <li onclick="window.location.href = 'animais.html'">Animais</li>
+          <li onclick="window.location.href = 'internacao.html'">Internação</li>
+          <li onclick="window.location.href = 'vacinas.html'">Vacinas</li>
+          <li onclick="window.location.href = 'financeiro.html'" class="active">
+            Financeiro
+          </li>
+        </ul>
+      </aside>
+
+      <section class="content-area">
+        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">
+          ☰
+        </button>
+        <div id="conteudoServico">
+          <article id="view-financeiro">
+            <h2>Controle Financeiro</h2>
+
+            <!-- Resumo / Cards -->
+            <div class="financeiro-resumo">
+              <div class="card-resumo receita">
+                <span>Receitas</span>
+                <strong id="totalReceitas">R$ 0,00</strong>
+              </div>
+              <div class="card-resumo despesa">
+                <span>Despesas</span>
+                <strong id="totalDespesas">R$ 0,00</strong>
+              </div>
+              <div class="card-resumo saldo">
+                <span>Saldo</span>
+                <strong id="totalSaldo">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <!-- Filtros e Ações -->
+            <div class="filters-container">
+              <div class="form-group">
+                <input type="date" id="filtroInicio" title="Data Início" />
+                <input type="date" id="filtroFim" title="Data Fim" />
+                <select id="filtroTipo">
+                  <option value="">Todos os Tipos</option>
+                  <option value="Receita">Receita</option>
+                  <option value="Despesa">Despesa</option>
+                </select>
+                <select id="filtroStatus">
+                  <option value="">Todos Status</option>
+                  <option value="Pago">Pago</option>
+                  <option value="Pendente">Pendente</option>
+                </select>
+              </div>
+              <button id="btnNovoLancamento" class="btn btn-primary">
+                Novo Lançamento
+              </button>
+            </div>
+
+            <!-- Tabela -->
+            <table>
+              <thead>
+                <tr>
+                  <th>Vencimento</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-financeiro">
+                <!-- JS -->
+              </tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Lançamento -->
+    <div id="modalFinanceiro" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2 id="modalTitle">Novo Lançamento</h2>
+        <form id="formFinanceiro">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="tipo" required>
+              <option value="Receita">Receita</option>
+              <option value="Despesa">Despesa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <input
+              type="text"
+              id="descricao"
+              required
+              placeholder="Ex: Consulta Rex"
+            />
+          </div>
+          <div class="form-group">
+            <label>Categoria</label>
+            <input
+              type="text"
+              id="categoria"
+              list="listaCategorias"
+              placeholder="Ex: Consulta, Vacina, Aluguel"
+            />
+            <datalist id="listaCategorias">
+              <option value="Consulta"></option>
+              <option value="Vacina"></option>
+              <option value="Cirurgia"></option>
+              <option value="Exame"></option>
+              <option value="Venda de Produto"></option>
+              <option value="Aluguel"></option>
+              <option value="Fornecedor"></option>
+              <option value="Salário"></option>
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="valor" step="0.01" required />
+          </div>
+          <div class="form-group">
+            <label>Data Vencimento</label>
+            <input type="date" id="dataVencimento" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="status">
+              <option value="Pendente">Pendente</option>
+              <option value="Pago">Pago</option>
+            </select>
+          </div>
+          <div class="btn-toolbar">
+            <button type="button" id="btnCancelar" class="btn btn-secondary">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../js/session-auth.js"></script>
+    <script src="../js/financeiro.js"></script>
+  </body>
+</html>

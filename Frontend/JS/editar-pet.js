@@ -1,54 +1,129 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const animalId = params.get("id");
+
+  if (!animalId) {
+    alert("Animal não especificado.");
+    window.location.href = "animais.html";
+    return;
+  }
+
   const form = document.getElementById("formPet");
   form.noValidate = true;
+
+  // Elementos de UI
   const inputNascimento = document.getElementById("nascimento");
   const spanIdade = document.getElementById("idade-calculada");
-
-  // Elementos do Modal de Alergias
-  const btnOpenAlergias = document.getElementById("btnOpenAlergias");
-  const modalAlergias = document.getElementById("modalAlergias");
-  const inputNovaAlergia = document.getElementById("inputNovaAlergia");
-  const btnAddAlergiaItem = document.getElementById("btnAddAlergiaItem");
-  const listaAlergiasModal = document.getElementById("listaAlergiasModal");
-  const btnSaveAlergias = document.getElementById("btnSaveAlergias");
-  const btnCancelAlergias = document.getElementById("btnCancelAlergias");
-  const alergiasTags = document.getElementById("alergiasTags");
-  const inputAlergias = document.getElementById("alergias");
-  let alergiasTemp = [];
-
-  // Elementos do Modal de Vacinas
-  const btnOpenVacinas = document.getElementById("btnOpenVacinas");
-  const modalVacinas = document.getElementById("modalVacinas");
-  const inputNomeVacina = document.getElementById("inputNomeVacina");
-  const inputDataVacina = document.getElementById("inputDataVacina");
-  const inputDataRevacinaItem = document.getElementById(
-    "inputDataRevacinaItem"
-  );
-  const btnAddVacinaItem = document.getElementById("btnAddVacinaItem");
-  const listaVacinasModal = document.getElementById("listaVacinasModal");
-  const btnSaveVacinas = document.getElementById("btnSaveVacinas");
-  const btnCancelVacinas = document.getElementById("btnCancelVacinas");
-  const vacinasTags = document.getElementById("vacinasTags");
-  const inputVacinacao = document.getElementById("vacinacao");
-  let vacinasTemp = [];
-
-  // Carregar Tutores para o Datalist
-  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
-  const datalist = document.getElementById("listaTutores");
-  tutores.sort((a, b) => a.nome.localeCompare(b.nome));
-  tutores.forEach((t) => {
-    const option = document.createElement("option");
-    option.value = t.nome;
-    option.textContent = `CPF: ${t.cpf}`;
-    datalist.appendChild(option);
-  });
-
-  // Lógica da Foto
   const inputFoto = document.getElementById("foto");
   const imgPreview = document.getElementById("foto-preview");
   const placeholder = document.getElementById("foto-placeholder");
-  let fotoBase64 = "";
 
+  // Variáveis de estado
+  let fotoBase64 = "";
+  let tutores = [];
+  let alergiasTemp = [];
+  let vacinasTemp = [];
+
+  // --- Carregar Tutores ---
+  const datalist = document.getElementById("listaTutores");
+  async function carregarTutores() {
+    try {
+      const response = await fetch("/tutores");
+      if (response.ok) {
+        tutores = await response.json();
+        tutores.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        datalist.innerHTML = "";
+        tutores.forEach((t) => {
+          const option = document.createElement("option");
+          option.value = t.nome;
+          option.textContent = `CPF: ${t.cpf || ""}`;
+          datalist.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar tutores:", error);
+    }
+  }
+
+  // --- Carregar Dados do Animal ---
+  async function carregarAnimal() {
+    try {
+      const response = await fetch(`/animais/${animalId}`);
+      if (!response.ok) throw new Error("Erro ao buscar animal");
+
+      const animal = await response.json();
+      preencherFormulario(animal);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao carregar dados do animal.");
+      window.location.href = "animais.html";
+    }
+  }
+
+  function preencherFormulario(animal) {
+    // Campos simples
+    document.getElementById("nome").value = animal.nome || "";
+    document.getElementById("especie").value = animal.especie || "";
+    document.getElementById("raca").value = animal.raca || "";
+    document.getElementById("sexo").value = animal.sexo || "";
+    document.getElementById("porte").value = animal.porte || "";
+    document.getElementById("peso").value = animal.peso || "";
+    document.getElementById("condicaoReprodutiva").value =
+      animal.condicao_reprodutiva || "Inteiro";
+    document.getElementById("ambiente").value = animal.ambiente || "";
+    document.getElementById("alimentacao").value = animal.alimentacao || "";
+    document.getElementById("observacoes").value = animal.observacoes || "";
+    document.getElementById("nascimento").value = animal.nascimento || "";
+
+    // Tutor
+    if (animal.tutor_id) {
+      const tutor = tutores.find((t) => t.id == animal.tutor_id);
+      if (tutor) {
+        document.getElementById("tutorInput").value = tutor.nome;
+      }
+    }
+
+    // Foto
+    if (animal.foto) {
+      fotoBase64 = animal.foto;
+      imgPreview.src = fotoBase64;
+      imgPreview.style.display = "block";
+      placeholder.style.display = "none";
+    }
+
+    // Idade
+    if (animal.nascimento) {
+      spanIdade.textContent = `Idade: ${calcularIdade(animal.nascimento)}`;
+    }
+
+    // Alergias
+    document.getElementById("alergias").value = animal.alergias || "";
+    if (animal.alergias) {
+      alergiasTemp = animal.alergias
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s);
+      renderAlergiasTags();
+    }
+
+    // Vacinas
+    document.getElementById("vacinacao").value = animal.vacinacao || "";
+    if (animal.vacinacao) {
+      try {
+        vacinasTemp = JSON.parse(animal.vacinacao);
+      } catch (e) {
+        vacinasTemp = [];
+      }
+      renderVacinasTags();
+    }
+  }
+
+  // Inicialização
+  await carregarTutores();
+  await carregarAnimal();
+
+  // --- Lógica de Foto ---
   inputFoto.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -68,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Cálculo de Idade
+  // --- Cálculo de Idade ---
   inputNascimento.addEventListener("change", () => {
     if (inputNascimento.value) {
       spanIdade.textContent = `Idade: ${calcularIdade(inputNascimento.value)}`;
@@ -93,132 +168,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${idade} anos`;
   }
 
-  // --- CARREGAR DADOS DO PET ---
-  const params = new URLSearchParams(window.location.search);
-  const idAnimal = params.get("id");
-  const animais = JSON.parse(localStorage.getItem("animais")) || [];
-  const animalIndex = animais.findIndex((a) => a.id === idAnimal);
+  // --- Modais (Alergias e Vacinas) ---
+  const modalAlergias = document.getElementById("modalAlergias");
+  const listaAlergiasModal = document.getElementById("listaAlergiasModal");
+  const alergiasTags = document.getElementById("alergiasTags");
+  const inputAlergias = document.getElementById("alergias");
 
-  if (animalIndex === -1) {
-    alert("Animal não encontrado!");
-    window.location.href = "animais.html";
-  }
-
-  const animal = animais[animalIndex];
-
-  // Preencher campos
-  document.getElementById("tutorInput").value = animal.tutorNome || "";
-  document.getElementById("nome").value = animal.nome || "";
-  document.getElementById("especie").value = animal.especie || "";
-  document.getElementById("raca").value = animal.raca || "";
-  document.getElementById("sexo").value = animal.sexo || "";
-  document.getElementById("nascimento").value = animal.nascimento || "";
-  if (animal.nascimento) {
-    spanIdade.textContent = `Idade: ${calcularIdade(animal.nascimento)}`;
-  }
-  document.getElementById("peso").value = animal.peso || "";
-  document.getElementById("porte").value = animal.porte || "";
-  document.getElementById("condicaoReprodutiva").value =
-    animal.condicaoReprodutiva || "";
-  document.getElementById("ambiente").value = animal.ambiente || "";
-  document.getElementById("alimentacao").value = animal.alimentacao || "";
-  document.getElementById("observacoes").value = animal.observacoes || "";
-
-  // Foto
-  if (animal.foto) {
-    fotoBase64 = animal.foto;
-    imgPreview.src = fotoBase64;
-    imgPreview.style.display = "block";
-    placeholder.style.display = "none";
-  }
-
-  // Alergias
-  inputAlergias.value = animal.alergias || "";
-  alergiasTemp = inputAlergias.value
-    ? inputAlergias.value
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s)
-    : [];
-  renderAlergiasTags();
-
-  // Vacinas
-  inputVacinacao.value = animal.vacinacao || "";
-  try {
-    vacinasTemp = inputVacinacao.value ? JSON.parse(inputVacinacao.value) : [];
-  } catch (e) {
-    vacinasTemp = inputVacinacao.value
-      ? [{ nome: inputVacinacao.value, data: "", revacina: "" }]
-      : [];
-  }
-  renderVacinasTags();
-
-  // --- SALVAR ALTERAÇÕES ---
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    let isValid = true;
-    const requiredFields = form.querySelectorAll("[required]");
-    requiredFields.forEach((field) => {
-      if (!field.value.trim()) {
-        field.classList.add("input-error");
-        isValid = false;
-      } else {
-        field.classList.remove("input-error");
-      }
-    });
-
-    if (!isValid) {
-      alert("Por favor, preencha todos os campos obrigatórios destacados.");
-      return;
-    }
-
-    const nomeTutor = document.getElementById("tutorInput").value;
-    const tutorObj = tutores.find((t) => t.nome === nomeTutor);
-
-    if (!tutorObj) {
-      document.getElementById("tutorInput").classList.add("input-error");
-      alert("Por favor, selecione um tutor válido da lista.");
-      return;
-    }
-
-    // Atualiza objeto
-    animais[animalIndex] = {
-      ...animais[animalIndex], // Mantém ID e outros campos não editáveis se houver
-      tutorId: tutorObj.id,
-      tutorNome: tutorObj.nome,
-      nome: document.getElementById("nome").value,
-      especie: document.getElementById("especie").value,
-      raca: document.getElementById("raca").value,
-      sexo: document.getElementById("sexo").value,
-      nascimento: document.getElementById("nascimento").value,
-      peso: document.getElementById("peso").value,
-      porte: document.getElementById("porte").value,
-      condicaoReprodutiva: document.getElementById("condicaoReprodutiva").value,
-      alergias: document.getElementById("alergias").value,
-      vacinacao: document.getElementById("vacinacao").value,
-      ambiente: document.getElementById("ambiente").value,
-      alimentacao: document.getElementById("alimentacao").value,
-      observacoes: document.getElementById("observacoes").value,
-      foto: fotoBase64,
-    };
-
-    localStorage.setItem("animais", JSON.stringify(animais));
-    alert("Pet atualizado com sucesso!");
-    window.location.href = "animais.html";
-  });
-
-  // --- Lógica do Modal de Alergias ---
   function renderAlergiasTags() {
-    if (!alergiasTags || !inputAlergias) return;
     alergiasTags.innerHTML = "";
-    const alergiasStr = inputAlergias.value;
-    if (!alergiasStr) return;
-    const lista = alergiasStr
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s);
-    lista.forEach((alergia) => {
+    alergiasTemp.forEach((alergia) => {
       const tag = document.createElement("span");
       tag.className = "alergia-tag";
       tag.textContent = alergia;
@@ -246,61 +204,47 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (btnOpenAlergias) {
-    btnOpenAlergias.addEventListener("click", () => {
-      const val = inputAlergias.value;
-      alergiasTemp = val
-        ? val
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s)
-        : [];
+  document.getElementById("btnOpenAlergias").addEventListener("click", () => {
+    renderListaModal();
+    modalAlergias.classList.remove("hidden");
+  });
+
+  document.getElementById("btnAddAlergiaItem").addEventListener("click", () => {
+    const val = document.getElementById("inputNovaAlergia").value.trim();
+    if (val) {
+      alergiasTemp.push(val);
+      document.getElementById("inputNovaAlergia").value = "";
       renderListaModal();
-      modalAlergias.classList.remove("hidden");
-    });
-  }
-
-  if (btnAddAlergiaItem) {
-    btnAddAlergiaItem.addEventListener("click", () => {
-      const val = inputNovaAlergia.value.trim();
-      if (val) {
-        alergiasTemp.push(val);
-        inputNovaAlergia.value = "";
-        renderListaModal();
-      }
-    });
-  }
-
-  if (btnSaveAlergias) {
-    btnSaveAlergias.addEventListener("click", () => {
-      inputAlergias.value = alergiasTemp.join(", ");
-      renderAlergiasTags();
-      modalAlergias.classList.add("hidden");
-    });
-  }
-
-  if (btnCancelAlergias) {
-    btnCancelAlergias.addEventListener("click", () => {
-      modalAlergias.classList.add("hidden");
-    });
-  }
-
-  // --- Lógica do Modal de Vacinas ---
-  function renderVacinasTags() {
-    if (!vacinasTags || !inputVacinacao) return;
-    vacinasTags.innerHTML = "";
-    const vacinasStr = inputVacinacao.value;
-    let lista = [];
-    try {
-      lista = vacinasStr ? JSON.parse(vacinasStr) : [];
-    } catch (e) {
-      if (vacinasStr) lista = [{ nome: vacinasStr, data: "", revacina: "" }];
     }
+  });
 
+  document.getElementById("btnSaveAlergias").addEventListener("click", () => {
+    inputAlergias.value = alergiasTemp.join(", ");
+    renderAlergiasTags();
+    modalAlergias.classList.add("hidden");
+  });
+
+  document.getElementById("btnCancelAlergias").addEventListener("click", () => {
+    modalAlergias.classList.add("hidden");
+  });
+
+  // Vacinas
+  const modalVacinas = document.getElementById("modalVacinas");
+  const listaVacinasModal = document.getElementById("listaVacinasModal");
+  const vacinasTags = document.getElementById("vacinasTags");
+  const inputVacinacao = document.getElementById("vacinacao");
+  const inputNomeVacina = document.getElementById("inputNomeVacina");
+  const inputDataVacina = document.getElementById("inputDataVacina");
+  const inputDataRevacinaItem = document.getElementById(
+    "inputDataRevacinaItem",
+  );
+
+  function renderVacinasTags() {
+    vacinasTags.innerHTML = "";
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    lista.forEach((vacina) => {
+    vacinasTemp.forEach((vacina) => {
       const tag = document.createElement("span");
       tag.className = "vacina-tag";
 
@@ -314,15 +258,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      const dataFormatada = vacina.data
-        ? new Date(vacina.data).toLocaleDateString("pt-BR")
-        : "";
-      const revacinaFormatada = vacina.revacina
-        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
-        : "";
       let texto = vacina.nome;
-      if (dataFormatada) texto += ` (${dataFormatada})`;
-      if (revacinaFormatada) texto += ` ➝ Rev: ${revacinaFormatada}`;
+      if (vacina.data)
+        texto += ` (${new Date(vacina.data).toLocaleDateString("pt-BR")})`;
       if (isVencida) texto += " ⚠️";
       tag.textContent = texto;
       vacinasTags.appendChild(tag);
@@ -331,32 +269,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderListaVacinasModal() {
     listaVacinasModal.innerHTML = "";
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
     vacinasTemp.forEach((vacina, index) => {
       const li = document.createElement("li");
-      const divInfo = document.createElement("div");
-      const dataFormatada = vacina.data
-        ? new Date(vacina.data).toLocaleDateString("pt-BR")
-        : "Sem data";
-      const revacinaFormatada = vacina.revacina
-        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
-        : "-";
-      divInfo.textContent = `${vacina.nome} | Aplic: ${dataFormatada} | Próx: ${revacinaFormatada}`;
-      if (vacina.revacina) {
-        const [ano, mes, dia] = vacina.revacina.split("-").map(Number);
-        const dataRevacina = new Date(ano, mes - 1, dia);
-        if (dataRevacina < hoje) {
-          li.style.color = "#b91c1c";
-          li.style.backgroundColor = "#fef2f2";
-          const spanAlert = document.createElement("span");
-          spanAlert.textContent = " ⚠️ VENCIDA";
-          spanAlert.style.fontWeight = "bold";
-          spanAlert.style.marginLeft = "5px";
-          divInfo.appendChild(spanAlert);
-        }
-      }
-      li.appendChild(divInfo);
+      li.textContent = `${vacina.nome} | Aplic: ${vacina.data || "-"} | Rev: ${vacina.revacina || "-"}`;
       const btnRemove = document.createElement("button");
       btnRemove.textContent = "❌";
       btnRemove.style.marginLeft = "10px";
@@ -372,57 +287,93 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function calcularRevacina() {
-    const dataAplicacao = inputDataVacina.value;
-    if (dataAplicacao) {
-      const data = new Date(dataAplicacao);
-      data.setDate(data.getDate() + 365);
-      inputDataRevacinaItem.value = data.toISOString().split("T")[0];
+  // Auto-calculo revacina
+  inputDataVacina.addEventListener("change", () => {
+    if (inputDataVacina.value) {
+      const d = new Date(inputDataVacina.value);
+      d.setDate(d.getDate() + 365);
+      inputDataRevacinaItem.value = d.toISOString().split("T")[0];
     }
-  }
-  if (inputDataVacina)
-    inputDataVacina.addEventListener("change", calcularRevacina);
-  if (inputNomeVacina)
-    inputNomeVacina.addEventListener("input", () => {
-      if (inputDataVacina.value && !inputDataRevacinaItem.value)
-        calcularRevacina();
-    });
+  });
 
-  if (btnOpenVacinas)
-    btnOpenVacinas.addEventListener("click", () => {
-      const val = inputVacinacao.value;
-      try {
-        vacinasTemp = val ? JSON.parse(val) : [];
-      } catch (e) {
-        vacinasTemp = val ? [{ nome: val, data: "", revacina: "" }] : [];
-      }
+  document.getElementById("btnOpenVacinas").addEventListener("click", () => {
+    renderListaVacinasModal();
+    modalVacinas.classList.remove("hidden");
+  });
+
+  document.getElementById("btnAddVacinaItem").addEventListener("click", () => {
+    const nome = inputNomeVacina.value.trim();
+    const data = inputDataVacina.value;
+    const revacina = inputDataRevacinaItem.value;
+    if (nome) {
+      vacinasTemp.push({ nome, data, revacina });
+      inputNomeVacina.value = "";
+      inputDataVacina.value = "";
+      inputDataRevacinaItem.value = "";
       renderListaVacinasModal();
-      modalVacinas.classList.remove("hidden");
-    });
-  if (btnAddVacinaItem)
-    btnAddVacinaItem.addEventListener("click", () => {
-      const nome = inputNomeVacina.value.trim();
-      const data = inputDataVacina.value;
-      const revacina = inputDataRevacinaItem.value;
-      if (nome) {
-        vacinasTemp.push({ nome, data, revacina });
-        inputNomeVacina.value = "";
-        inputDataVacina.value = "";
-        inputDataRevacinaItem.value = "";
-        inputNomeVacina.focus();
-        renderListaVacinasModal();
+    } else {
+      alert("Nome da vacina é obrigatório.");
+    }
+  });
+
+  document.getElementById("btnSaveVacinas").addEventListener("click", () => {
+    inputVacinacao.value = JSON.stringify(vacinasTemp);
+    renderVacinasTags();
+    modalVacinas.classList.add("hidden");
+  });
+
+  document.getElementById("btnCancelVacinas").addEventListener("click", () => {
+    modalVacinas.classList.add("hidden");
+  });
+
+  // --- Salvar Alterações ---
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Validação Tutor
+    const nomeTutor = document.getElementById("tutorInput").value;
+    const tutorObj = tutores.find((t) => t.nome === nomeTutor);
+    if (!tutorObj) {
+      alert("Selecione um tutor válido.");
+      return;
+    }
+
+    const dadosAtualizados = {
+      tutor_id: tutorObj.id,
+      nome: document.getElementById("nome").value,
+      especie: document.getElementById("especie").value,
+      raca: document.getElementById("raca").value,
+      sexo: document.getElementById("sexo").value,
+      nascimento: document.getElementById("nascimento").value,
+      peso: document.getElementById("peso").value,
+      porte: document.getElementById("porte").value,
+      condicao_reprodutiva: document.getElementById("condicaoReprodutiva")
+        .value,
+      alergias: document.getElementById("alergias").value,
+      vacinacao: document.getElementById("vacinacao").value,
+      ambiente: document.getElementById("ambiente").value,
+      alimentacao: document.getElementById("alimentacao").value,
+      observacoes: document.getElementById("observacoes").value,
+      foto: fotoBase64,
+    };
+
+    try {
+      const response = await fetch(`/animais/${animalId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosAtualizados),
+      });
+
+      if (response.ok) {
+        alert("Pet atualizado com sucesso!");
+        window.location.href = "animais.html";
       } else {
-        alert("Digite o nome da vacina.");
+        const err = await response.json();
+        alert("Erro ao atualizar: " + (err.error || "Erro desconhecido"));
       }
-    });
-  if (btnSaveVacinas)
-    btnSaveVacinas.addEventListener("click", () => {
-      inputVacinacao.value = JSON.stringify(vacinasTemp);
-      renderVacinasTags();
-      modalVacinas.classList.add("hidden");
-    });
-  if (btnCancelVacinas)
-    btnCancelVacinas.addEventListener("click", () => {
-      modalVacinas.classList.add("hidden");
-    });
+    } catch (error) {
+      console.error(error);
+      alert("Erro de conexão.");
+    }
+  });
 });

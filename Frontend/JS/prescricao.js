@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Atualiza os links dos botões de ação para manter o ID do atendimento
   atualizarLinksAcao(atendimentoId);
+  carregarCabecalhoAtendimento(atendimentoId);
 
   carregarHistoricoPrescricoes(atendimentoId);
   setupModalAlergias(atendimentoId);
@@ -31,12 +32,55 @@ function atualizarLinksAcao(id) {
   });
 }
 
-function carregarHistoricoPrescricoes(atendimentoId) {
-  const tbody = document.getElementById("tbody-prescricao");
-  const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
+async function carregarCabecalhoAtendimento(id) {
+  try {
+    const response = await fetch(`/atendimentos/${id}`);
+    if (response.ok) {
+      const at = await response.json();
 
-  // Filtrar por atendimento
-  const lista = prescricoes.filter((p) => p.atendimentoId === atendimentoId);
+      // Preencher Header
+      document.getElementById("headerAnimalNome").textContent =
+        at.animal_nome || at.animal;
+      document.getElementById("headerTutor").textContent =
+        at.tutor_nome || at.tutor;
+      document.getElementById("headerQueixa").textContent = at.queixa || "--";
+      document.getElementById("headerPeso").textContent = at.peso || "--";
+      document.getElementById("headerTemp").textContent =
+        at.temperatura || "--";
+      document.getElementById("headerFC").textContent =
+        at.frequencia_cardiaca || "--";
+      document.getElementById("headerFR").textContent =
+        at.frequencia_respiratoria || "--";
+      document.getElementById("headerTPC").textContent = at.tpc || "--";
+      document.getElementById("headerMucosas").textContent = at.mucosas || "--";
+      document.getElementById("headerHidratacao").textContent =
+        at.hidratacao || "--";
+      document.getElementById("headerConsciencia").textContent =
+        at.consciencia || "--";
+
+      // Alergias
+      const headerAlergias = document.getElementById("headerAlergias");
+      if (headerAlergias) headerAlergias.textContent = at.alergias || "";
+
+      // Buscar dados extras do animal se necessário (foto, idade, etc)
+      if (at.animal_id) {
+        const resAnimal = await fetch(`/animais/${at.animal_id}`);
+        if (resAnimal.ok) {
+          const animal = await resAnimal.json();
+          // Preencher foto e idade aqui se os elementos existirem no HTML
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Erro ao carregar cabeçalho", e);
+  }
+}
+
+async function carregarHistoricoPrescricoes(atendimentoId) {
+  const tbody = document.getElementById("tbody-prescricao");
+
+  const response = await fetch(`/prescricoes?atendimento_id=${atendimentoId}`);
+  const lista = await response.json();
 
   tbody.innerHTML = "";
 
@@ -59,15 +103,15 @@ function carregarHistoricoPrescricoes(atendimentoId) {
     tr.innerHTML = `
       <td>${dataFormatada}</td>
       <td>${resumoMedicamentos}</td>
-      <td>${p.veterinario || "--"}</td>
+      <td>${p.veterinario_nome || "--"}</td>
       <td>
-        <button class="btn-visualizar" title="Visualizar" onclick="visualizarPrescricao('${
+        <button class="btn-visualizar" title="Visualizar" onclick="visualizarPrescricao(${
           p.id
         }')" style="cursor:pointer; border:none; background:transparent; margin-right: 5px; font-size: 1.2rem;">👁️</button>
-        <button class="btn-duplicar" title="Duplicar" onclick="duplicarPrescricao('${
+        <button class="btn-duplicar" title="Duplicar" onclick="duplicarPrescricao(${
           p.id
         }')" style="cursor:pointer; border:none; background:transparent; margin-right: 5px; font-size: 1.2rem;">📋</button>
-        <button class="btn-imprimir" title="Imprimir" onclick="imprimirPrescricao('${
+        <button class="btn-imprimir" title="Imprimir" onclick="imprimirPrescricao(${
           p.id
         }')" style="cursor:pointer; border:none; background:transparent; font-size: 1.2rem;">🖨️</button>
       </td>
@@ -76,103 +120,68 @@ function carregarHistoricoPrescricoes(atendimentoId) {
   });
 }
 
-function visualizarPrescricao(id) {
-  const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-  const prescricao = prescricoes.find((p) => p.id === id);
-
-  if (!prescricao) return;
-
+async function visualizarPrescricao(id) {
+  // Busca detalhes para pegar o atendimento_id correto se necessário, ou usa URL
+  const params = new URLSearchParams(window.location.search);
+  const atendimentoId = params.get("id");
   // Redireciona para a página de nova prescrição em modo de visualização
-  window.location.href = `nova-prescricao.html?id=${prescricao.atendimentoId}&prescricaoId=${id}&view=true`;
+  window.location.href = `nova-prescricao.html?id=${atendimentoId}&prescricaoId=${id}&view=true`;
 }
 
-function duplicarPrescricao(id) {
-  const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-  const prescricao = prescricoes.find((p) => p.id === id);
-
-  if (!prescricao) return;
-
+async function duplicarPrescricao(id) {
+  const params = new URLSearchParams(window.location.search);
+  const atendimentoId = params.get("id");
   // Redireciona para a página de nova prescrição carregando os dados da antiga como base (sem view=true)
-  window.location.href = `nova-prescricao.html?id=${prescricao.atendimentoId}&prescricaoId=${id}`;
+  window.location.href = `nova-prescricao.html?id=${atendimentoId}&prescricaoId=${id}`;
 }
 
-function imprimirPrescricao(id) {
-  const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
-  const prescricao = prescricoes.find((p) => p.id === id);
+async function imprimirPrescricao(id) {
+  try {
+    const resPresc = await fetch(`/prescricoes/${id}`);
+    if (!resPresc.ok) throw new Error("Prescrição não encontrada");
+    const prescricao = await resPresc.json();
 
-  if (!prescricao) {
-    alert("Prescrição não encontrada.");
-    return;
-  }
+    const resAtend = await fetch(`/atendimentos/${prescricao.atendimento_id}`);
+    const atendimento = await resAtend.json();
 
-  const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-  const atendimento = atendimentos.find(
-    (a) => a.id == prescricao.atendimentoId
-  );
+    const nomeTutor = atendimento.tutor_nome || atendimento.tutor || "--";
+    const nomeAnimal = atendimento.animal_nome || atendimento.animal || "--";
 
-  let nomeTutor = "--";
-  let nomeAnimal = "--";
-
-  if (atendimento) {
-    const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
-    const animais = JSON.parse(localStorage.getItem("animais")) || [];
-
-    // Tenta achar nomes pelos IDs ou strings salvas no atendimento
-    let tutor = null;
-    if (atendimento.tutorId) {
-      tutor = tutores.find((t) => t.id == atendimento.tutorId);
+    // Buscar dados adicionais (Evoluções, etc) - Placeholder por enquanto
+    let evolucoes = [];
+    try {
+      const resEvol = await fetch(
+        `/evolucoes?atendimento_id=${prescricao.atendimento_id}`,
+      );
+      if (resEvol.ok) evolucoes = await resEvol.json();
+    } catch (e) {
+      console.error("Erro ao buscar evoluções para impressão", e);
     }
-    if (!tutor) {
-      tutor = tutores.find((t) => t.nome === atendimento.tutor);
-    }
-    nomeTutor = tutor ? tutor.nome : atendimento.tutor || "--";
 
-    let animal = null;
-    if (atendimento.animalId) {
-      animal = animais.find((a) => a.id == atendimento.animalId);
-    }
-    if (!animal) {
-      animal = animais.find((a) => a.nome === atendimento.animal);
-    }
-    nomeAnimal = animal ? animal.nome : atendimento.animal || "--";
-  }
+    const exames = [];
+    const procedimentos = [];
+    const afericoes = [];
 
-  // Buscar dados adicionais vinculados ao atendimento
-  const evolucoes = (
-    JSON.parse(localStorage.getItem("evolucoes")) || []
-  ).filter((e) => e.atendimentoId === prescricao.atendimentoId);
-  const exames = (JSON.parse(localStorage.getItem("exames")) || []).filter(
-    (e) => e.atendimentoId === prescricao.atendimentoId
-  );
-  const procedimentos = (
-    JSON.parse(localStorage.getItem("procedimentos")) || []
-  ).filter((p) => p.atendimentoId === prescricao.atendimentoId);
-  const afericoes = (
-    JSON.parse(localStorage.getItem("afericoes")) || []
-  ).filter((a) => a.atendimentoId === prescricao.atendimentoId);
+    // Gerar HTML para seções extras
+    let htmlExtras = "";
 
-  // Gerar HTML para seções extras
-  let htmlExtras = "";
-
-  if (evolucoes.length > 0) {
-    htmlExtras += `<h3>Evoluções Clínicas</h3>
+    if (evolucoes.length > 0) {
+      htmlExtras += `<h3>Evoluções Clínicas</h3>
     <table class="print-table">
       <thead><tr><th>Data/Hora</th><th>Descrição</th></tr></thead>
       <tbody>
         ${evolucoes
           .map(
             (e) =>
-              `<tr><td>${e.data || e.dataEvolucao} ${
-                e.hora || e.horaEvolucao
-              }</td><td>${e.descricao || e.descricaoEvolucao}</td></tr>`
+              `<tr><td>${new Date(e.data_hora).toLocaleString()}</td><td>${e.descricao}</td></tr>`,
           )
           .join("")}
       </tbody>
     </table>`;
-  }
+    }
 
-  if (exames.length > 0) {
-    htmlExtras += `<h3>Exames Solicitados</h3>
+    if (exames.length > 0) {
+      htmlExtras += `<h3>Exames Solicitados</h3>
     <table class="print-table">
       <thead><tr><th>Tipo</th><th>Prioridade</th><th>Indicação</th></tr></thead>
       <tbody>
@@ -181,29 +190,29 @@ function imprimirPrescricao(id) {
             (e) =>
               `<tr><td>${e.tipo || e.tipoExame}</td><td>${
                 e.prioridade || e.prioridadeExame
-              }</td><td>${e.indicacao || e.indicacaoClinica}</td></tr>`
+              }</td><td>${e.indicacao || e.indicacaoClinica}</td></tr>`,
           )
           .join("")}
       </tbody>
     </table>`;
-  }
+    }
 
-  if (procedimentos.length > 0) {
-    htmlExtras += `<h3>Procedimentos</h3>
+    if (procedimentos.length > 0) {
+      htmlExtras += `<h3>Procedimentos</h3>
     <table class="print-table">
       <thead><tr><th>Nome</th><th>Detalhes</th></tr></thead>
       <tbody>
         ${procedimentos
           .map(
-            (p) => `<tr><td>${p.nome}</td><td>${p.detalhes || "-"}</td></tr>`
+            (p) => `<tr><td>${p.nome}</td><td>${p.detalhes || "-"}</td></tr>`,
           )
           .join("")}
       </tbody>
     </table>`;
-  }
+    }
 
-  if (afericoes.length > 0) {
-    htmlExtras += `<h3>Aferições / Sinais Vitais</h3>
+    if (afericoes.length > 0) {
+      htmlExtras += `<h3>Aferições / Sinais Vitais</h3>
     <table class="print-table">
       <thead><tr><th>Data/Hora</th><th>Temp</th><th>FC</th><th>FR</th></tr></thead>
       <tbody>
@@ -212,52 +221,56 @@ function imprimirPrescricao(id) {
             (a) =>
               `<tr><td>${a.data} ${a.hora}</td><td>${
                 a.temperatura || "-"
-              }</td><td>${a.fc || "-"}</td><td>${a.fr || "-"}</td></tr>`
+              }</td><td>${a.fc || "-"}</td><td>${a.fr || "-"}</td></tr>`,
           )
           .join("")}
       </tbody>
     </table>`;
-  }
+    }
 
-  // Preencher dados no template de impressão (DOM)
-  document.getElementById("print-vet").textContent =
-    prescricao.veterinario || "--";
-  document.getElementById("print-data").textContent = new Date(
-    prescricao.data
-  ).toLocaleString();
-  document.getElementById("print-tutor").textContent = nomeTutor;
-  document.getElementById("print-animal").textContent = nomeAnimal;
+    // Preencher dados no template de impressão (DOM)
+    document.getElementById("print-vet").textContent =
+      atendimento.veterinario_nome || "--";
+    document.getElementById("print-data").textContent = new Date(
+      prescricao.data,
+    ).toLocaleString();
+    document.getElementById("print-tutor").textContent = nomeTutor;
+    document.getElementById("print-animal").textContent = nomeAnimal;
 
-  const linhasMedicamentos = prescricao.medicamentos
-    .map(
-      (med) => `
+    const linhasMedicamentos = prescricao.medicamentos
+      .map(
+        (med) => `
       <tr>
         <td>${med.nome}</td>
         <td>${med.dose}</td>
         <td>${med.intervalo || "--"}</td>
       </tr>
-    `
-    )
-    .join("");
+    `,
+      )
+      .join("");
 
-  document.getElementById("print-medicamentos-tbody").innerHTML =
-    linhasMedicamentos;
-  document.getElementById("print-extras").innerHTML = htmlExtras;
+    document.getElementById("print-medicamentos-tbody").innerHTML =
+      linhasMedicamentos;
+    document.getElementById("print-extras").innerHTML = htmlExtras;
 
-  const obsContainer = document.getElementById("print-obs-container");
-  if (prescricao.observacoes) {
-    document.getElementById("print-obs-text").innerHTML =
-      prescricao.observacoes.replace(/\n/g, "<br>");
-    obsContainer.style.display = "block";
-  } else {
-    obsContainer.style.display = "none";
+    const obsContainer = document.getElementById("print-obs-container");
+    if (prescricao.observacoes) {
+      document.getElementById("print-obs-text").innerHTML =
+        prescricao.observacoes.replace(/\n/g, "<br>");
+      obsContainer.style.display = "block";
+    } else {
+      obsContainer.style.display = "none";
+    }
+
+    document.getElementById("print-data-impressao").textContent =
+      new Date().toLocaleString();
+
+    // Acionar impressão
+    window.print();
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao preparar impressão.");
   }
-
-  document.getElementById("print-data-impressao").textContent =
-    new Date().toLocaleString();
-
-  // Acionar impressão
-  window.print();
 }
 
 function setupModalAlergias(atendimentoId) {
@@ -293,18 +306,15 @@ function setupModalAlergias(atendimentoId) {
 
   if (btnOpenAlergias) {
     btnOpenAlergias.addEventListener("click", () => {
-      const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-      const atendimento = atendimentos.find((a) => a.id === atendimentoId);
-      
-      let alergiasStr = atendimento ? atendimento.alergias : "";
-      if (!alergiasStr && atendimento) {
-          const animais = JSON.parse(localStorage.getItem("animais")) || [];
-          const animal = animais.find(a => a.id === atendimento.animalId || a.nome === atendimento.animal);
-          if (animal) alergiasStr = animal.alergias;
-      }
+      // Usa o texto que já está no header (carregado via API)
+      const headerAlergias = document.getElementById("headerAlergias");
+      const alergiasStr = headerAlergias ? headerAlergias.textContent : "";
 
       alergiasTemp = alergiasStr
-        ? alergiasStr.split(",").map((s) => s.trim()).filter((s) => s)
+        ? alergiasStr
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s)
         : [];
       renderListaModal();
       if (modalAlergias) modalAlergias.classList.remove("hidden");
@@ -324,27 +334,11 @@ function setupModalAlergias(atendimentoId) {
 
   if (btnSaveAlergias) {
     btnSaveAlergias.addEventListener("click", () => {
-      const novasAlergias = alergiasTemp.join(", ");
-      const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-      const indexAt = atendimentos.findIndex((a) => a.id === atendimentoId);
-      let animalId = null;
-      let animalNome = null;
-      if (indexAt !== -1) {
-        atendimentos[indexAt].alergias = novasAlergias;
-        animalId = atendimentos[indexAt].animalId;
-        animalNome = atendimentos[indexAt].animal;
-        localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
-      }
-      const animais = JSON.parse(localStorage.getItem("animais")) || [];
-      const indexAn = animais.findIndex(a => a.id === animalId || a.nome === animalNome);
-      if (indexAn !== -1) {
-          animais[indexAn].alergias = novasAlergias;
-          localStorage.setItem("animais", JSON.stringify(animais));
-      }
-      const headerAlergias = document.getElementById("headerAlergias");
-      if (headerAlergias) headerAlergias.textContent = novasAlergias || "--";
+      // Apenas visualização nesta tela, ou implementar PUT /atendimentos
+      alert(
+        "Edição de alergias deve ser feita no cadastro do animal ou na triagem.",
+      );
       if (modalAlergias) modalAlergias.classList.add("hidden");
-      alert("Alergias atualizadas!");
     });
   }
 

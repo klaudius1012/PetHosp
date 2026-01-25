@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Referências aos elementos do DOM
   const form = document.getElementById("formAtendimento");
   const selectTutor = document.getElementById("tutorSelect");
@@ -40,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalVacinas = document.getElementById("modalVacinas");
   const inputNomeVacina = document.getElementById("inputNomeVacina");
   const inputDataVacina = document.getElementById("inputDataVacina");
-  const inputDataRevacinaItem = document.getElementById("inputDataRevacinaItem");
+  const inputDataRevacinaItem = document.getElementById(
+    "inputDataRevacinaItem",
+  );
   const btnAddVacinaItem = document.getElementById("btnAddVacinaItem");
   const listaVacinasModal = document.getElementById("listaVacinasModal");
   const btnSaveVacinas = document.getElementById("btnSaveVacinas");
@@ -48,24 +50,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const vacinasTags = document.getElementById("vacinasTags");
   let vacinasTemp = [];
 
-  // Carregar dados do localStorage
-  const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
-  const animais = JSON.parse(localStorage.getItem("animais")) || [];
+  // Variáveis globais para armazenar dados carregados
+  let animaisDoTutor = [];
 
   // 1. Preencher Select de Tutores
-  selectTutor.innerHTML = '<option value="">Selecione...</option>';
-  tutores.forEach((t) => {
-    const option = document.createElement("option");
-    option.value = t.nome;
-    option.textContent = t.nome;
-    option.dataset.id = t.id; // Guarda o ID no dataset para busca
-    selectTutor.appendChild(option);
-  });
+  async function carregarTutores() {
+    try {
+      const response = await fetch("/tutores");
+      const tutores = await response.json();
+
+      // Ordenar
+      tutores.sort((a, b) => a.nome.localeCompare(b.nome));
+
+      selectTutor.innerHTML = '<option value="">Selecione...</option>';
+      tutores.forEach((t) => {
+        const option = document.createElement("option");
+        option.value = t.id; // Value agora é o ID, não o nome
+        option.textContent = t.nome;
+        selectTutor.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Erro ao carregar tutores:", error);
+    }
+  }
+  await carregarTutores();
 
   // 2. Lógica de Dependência Tutor -> Animal
-  selectTutor.addEventListener("change", function () {
-    const selectedOption = this.options[this.selectedIndex];
-    const tutorId = selectedOption ? selectedOption.dataset.id : null;
+  selectTutor.addEventListener("change", async function () {
+    const tutorId = this.value;
 
     // Resetar select de animais
     selectAnimal.innerHTML =
@@ -87,23 +99,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (spanIdade) spanIdade.textContent = "";
 
     if (tutorId) {
-      // Filtrar animais deste tutor
-      const petsDoTutor = animais.filter((a) => a.tutorId == tutorId);
+      try {
+        const response = await fetch(`/animais?tutor_id=${tutorId}`);
+        animaisDoTutor = await response.json();
 
-      if (petsDoTutor.length > 0) {
-        selectAnimal.disabled = false;
-        selectAnimal.innerHTML =
-          '<option value="">Selecione o animal...</option>';
+        if (animaisDoTutor.length > 0) {
+          selectAnimal.disabled = false;
+          selectAnimal.innerHTML =
+            '<option value="">Selecione o animal...</option>';
 
-        petsDoTutor.forEach((a) => {
-          const option = document.createElement("option");
-          option.value = a.nome;
-          option.textContent = a.nome;
-          selectAnimal.appendChild(option);
-        });
-      } else {
-        selectAnimal.innerHTML =
-          '<option value="">Nenhum animal encontrado</option>';
+          animaisDoTutor.forEach((a) => {
+            const option = document.createElement("option");
+            option.value = a.id; // Value é o ID
+            option.textContent = a.nome;
+            selectAnimal.appendChild(option);
+          });
+        } else {
+          selectAnimal.innerHTML =
+            '<option value="">Nenhum animal encontrado</option>';
+        }
+      } catch (error) {
+        console.error("Erro ao buscar animais:", error);
       }
     }
   });
@@ -132,9 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Carregar dados do animal (Peso) ao selecionar
   selectAnimal.addEventListener("change", function () {
-    const nomeAnimal = this.value;
-    const selectedTutorOption = selectTutor.options[selectTutor.selectedIndex];
-    const tutorId = selectedTutorOption ? selectedTutorOption.dataset.id : null;
+    const animalId = this.value;
 
     // Elemento para exibir a idade (cria se não existir)
     let spanIdade = document.getElementById("spanIdadeAnimal");
@@ -167,14 +181,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputAmbiente) inputAmbiente.value = "";
     if (inputAlimentacao) inputAlimentacao.value = "";
 
-    if (nomeAnimal && tutorId) {
-      const animalEncontrado = animais.find(
-        (a) => a.nome === nomeAnimal && a.tutorId == tutorId
-      );
+    if (animalId) {
+      const animalEncontrado = animaisDoTutor.find((a) => a.id == animalId);
       if (animalEncontrado) {
         if (animalEncontrado.nascimento) {
           spanIdade.textContent = `Idade: ${calcularIdade(
-            animalEncontrado.nascimento
+            animalEncontrado.nascimento,
           )}`;
         }
         if (inputAlergias) {
@@ -199,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!isNaN(temperatura) && temperatura > 39.5) {
       alert(
-        `ALERTA: A temperatura informada (${temperatura}°C) indica febre alta!`
+        `ALERTA: A temperatura informada (${temperatura}°C) indica febre alta!`,
       );
 
       // Destaque visual
@@ -209,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Sugestão de mudança de prioridade
       if (selectPrioridade.value !== "Emergência") {
         const confirmar = confirm(
-          "Deseja alterar a prioridade para 'Emergência'?"
+          "Deseja alterar a prioridade para 'Emergência'?",
         );
         if (confirmar) {
           selectPrioridade.value = "Emergência";
@@ -226,23 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
   inputHora.value = isoString.slice(11, 16);
 
   // 5. Salvar Atendimento
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const selectedTutorOption = selectTutor.options[selectTutor.selectedIndex];
-    const tutorId = selectedTutorOption ? selectedTutorOption.dataset.id : null;
-    const animalObj = animais.find(
-      (a) => a.nome === selectAnimal.value && a.tutorId == tutorId
-    );
+    const tutorId = selectTutor.value;
+    const animalId = selectAnimal.value;
 
     const dadosAtendimento = {
-      id: "AT" + Date.now(),
-      tutor: selectTutor.value,
-      tutorId: tutorId,
-      animal: selectAnimal.value,
-      animalId: animalObj ? animalObj.id : null,
-      veterinario: selectVeterinario.value,
-      dataHora: `${inputData.value}T${inputHora.value}`,
+      tutor_id: tutorId,
+      animal_id: animalId,
+      veterinario_id: null, // Backend pega da sessão se nulo, ou implementar select de vets
+      data_hora: `${inputData.value}T${inputHora.value}`,
       peso: inputPeso.value,
       temperatura: inputTemperatura.value,
       frequenciaCardiaca: inputFC.value,
@@ -261,12 +267,24 @@ document.addEventListener("DOMContentLoaded", () => {
       observacoes: textObservacoes.value,
     };
 
-    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-    atendimentos.push(dadosAtendimento);
-    localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
+    try {
+      const response = await fetch("/atendimentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosAtendimento),
+      });
 
-    alert("Atendimento registrado com sucesso!");
-    window.location.href = "recepcao.html";
+      if (response.ok) {
+        alert("Atendimento registrado com sucesso!");
+        window.location.href = "recepcao.html";
+      } else {
+        const err = await response.json();
+        alert("Erro ao registrar: " + (err.error || "Erro desconhecido"));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erro de conexão.");
+    }
   });
 
   // --- Lógica do Modal de Alergias ---
@@ -337,28 +355,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (btnSaveAlergias) {
-    btnSaveAlergias.addEventListener("click", () => {
+    btnSaveAlergias.addEventListener("click", async () => {
       const novasAlergias = alergiasTemp.join(", ");
       inputAlergias.value = novasAlergias;
       renderAlergiasTags();
       modalAlergias.classList.add("hidden");
 
       // Atualizar cadastro do animal permanentemente
-      const nomeAnimal = selectAnimal.value;
-      const selectedTutorOption =
-        selectTutor.options[selectTutor.selectedIndex];
-      const tutorId = selectedTutorOption
-        ? selectedTutorOption.dataset.id
-        : null;
-
-      if (nomeAnimal && tutorId) {
-        const animalIndex = animais.findIndex(
-          (a) => a.nome === nomeAnimal && a.tutorId == tutorId
-        );
-        if (animalIndex !== -1) {
-          animais[animalIndex].alergias = novasAlergias;
-          localStorage.setItem("animais", JSON.stringify(animais));
+      const animalId = selectAnimal.value;
+      if (animalId) {
+        try {
+          await fetch(`/animais/${animalId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ alergias: novasAlergias }),
+          });
           alert("Alergias atualizadas no cadastro do animal!");
+        } catch (e) {
+          console.error("Erro ao atualizar alergias do animal", e);
         }
       }
     });
@@ -403,8 +417,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const tag = document.createElement("span");
       tag.className = "vacina-tag vencida";
 
-      const dataFormatada = vacina.data ? new Date(vacina.data).toLocaleDateString("pt-BR") : "";
-      const revacinaFormatada = vacina.revacina ? new Date(vacina.revacina).toLocaleDateString("pt-BR") : "";
+      const dataFormatada = vacina.data
+        ? new Date(vacina.data).toLocaleDateString("pt-BR")
+        : "";
+      const revacinaFormatada = vacina.revacina
+        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
+        : "";
       let texto = vacina.nome;
       if (dataFormatada) texto += ` (${dataFormatada})`;
       if (revacinaFormatada) texto += ` ➝ Rev: ${revacinaFormatada}`;
@@ -421,8 +439,12 @@ document.addEventListener("DOMContentLoaded", () => {
     vacinasTemp.forEach((vacina, index) => {
       const li = document.createElement("li");
       const divInfo = document.createElement("div");
-      const dataFormatada = vacina.data ? new Date(vacina.data).toLocaleDateString("pt-BR") : "Sem data";
-      const revacinaFormatada = vacina.revacina ? new Date(vacina.revacina).toLocaleDateString("pt-BR") : "-";
+      const dataFormatada = vacina.data
+        ? new Date(vacina.data).toLocaleDateString("pt-BR")
+        : "Sem data";
+      const revacinaFormatada = vacina.revacina
+        ? new Date(vacina.revacina).toLocaleDateString("pt-BR")
+        : "-";
       divInfo.textContent = `${vacina.nome} | Aplic: ${dataFormatada} | Próx: ${revacinaFormatada}`;
       if (vacina.revacina) {
         const [ano, mes, dia] = vacina.revacina.split("-").map(Number);
@@ -461,30 +483,65 @@ document.addEventListener("DOMContentLoaded", () => {
       inputDataRevacinaItem.value = data.toISOString().split("T")[0];
     }
   }
-  if (inputDataVacina) inputDataVacina.addEventListener("change", calcularRevacina);
-  if (inputNomeVacina) inputNomeVacina.addEventListener("input", () => { if (inputDataVacina.value && !inputDataRevacinaItem.value) calcularRevacina(); });
+  if (inputDataVacina)
+    inputDataVacina.addEventListener("change", calcularRevacina);
+  if (inputNomeVacina)
+    inputNomeVacina.addEventListener("input", () => {
+      if (inputDataVacina.value && !inputDataRevacinaItem.value)
+        calcularRevacina();
+    });
 
-  if (btnOpenVacinas) btnOpenVacinas.addEventListener("click", () => { const val = inputVacinacao.value; try { vacinasTemp = val ? JSON.parse(val) : []; } catch (e) { vacinasTemp = val ? [{ nome: val, data: "", revacina: "" }] : []; } renderListaVacinasModal(); modalVacinas.classList.remove("hidden"); });
-  if (btnAddVacinaItem) btnAddVacinaItem.addEventListener("click", () => { const nome = inputNomeVacina.value.trim(); const data = inputDataVacina.value; const revacina = inputDataRevacinaItem.value; if (nome) { vacinasTemp.push({ nome, data, revacina }); inputNomeVacina.value = ""; inputDataVacina.value = ""; inputDataRevacinaItem.value = ""; inputNomeVacina.focus(); renderListaVacinasModal(); } else { alert("Digite o nome da vacina."); } });
-  
+  if (btnOpenVacinas)
+    btnOpenVacinas.addEventListener("click", () => {
+      const val = inputVacinacao.value;
+      try {
+        vacinasTemp = val ? JSON.parse(val) : [];
+      } catch (e) {
+        vacinasTemp = val ? [{ nome: val, data: "", revacina: "" }] : [];
+      }
+      renderListaVacinasModal();
+      modalVacinas.classList.remove("hidden");
+    });
+  if (btnAddVacinaItem)
+    btnAddVacinaItem.addEventListener("click", () => {
+      const nome = inputNomeVacina.value.trim();
+      const data = inputDataVacina.value;
+      const revacina = inputDataRevacinaItem.value;
+      if (nome) {
+        vacinasTemp.push({ nome, data, revacina });
+        inputNomeVacina.value = "";
+        inputDataVacina.value = "";
+        inputDataRevacinaItem.value = "";
+        inputNomeVacina.focus();
+        renderListaVacinasModal();
+      } else {
+        alert("Digite o nome da vacina.");
+      }
+    });
+
   if (btnSaveVacinas) {
-    btnSaveVacinas.addEventListener("click", () => {
+    btnSaveVacinas.addEventListener("click", async () => {
       inputVacinacao.value = JSON.stringify(vacinasTemp);
       renderVacinasTags();
       modalVacinas.classList.add("hidden");
 
       // Atualizar cadastro do animal permanentemente
-      const nomeAnimal = selectAnimal.value;
-      const selectedTutorOption = selectTutor.options[selectTutor.selectedIndex];
-      const tutorId = selectedTutorOption ? selectedTutorOption.dataset.id : null;
-      if (nomeAnimal && tutorId) {
-        const animalIndex = animais.findIndex((a) => a.nome === nomeAnimal && a.tutorId == tutorId);
-        if (animalIndex !== -1) {
-          animais[animalIndex].vacinacao = inputVacinacao.value;
-          localStorage.setItem("animais", JSON.stringify(animais));
+      const animalId = selectAnimal.value;
+      if (animalId) {
+        try {
+          await fetch(`/animais/${animalId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vacinacao: inputVacinacao.value }),
+          });
+        } catch (e) {
+          console.error("Erro ao atualizar vacinas", e);
         }
       }
     });
   }
-  if (btnCancelVacinas) btnCancelVacinas.addEventListener("click", () => { modalVacinas.classList.add("hidden"); });
+  if (btnCancelVacinas)
+    btnCancelVacinas.addEventListener("click", () => {
+      modalVacinas.classList.add("hidden");
+    });
 });

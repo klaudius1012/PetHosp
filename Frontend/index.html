@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>Login</title>
+    <link rel="stylesheet" href="./css/login.css" />
+  </head>
+  <body>
+    <!-- Container Principal: Card de Login  -->
+    <main class="login-card card">
+      <!-- Seção Esquerda: Identidade Visual e Logo -->
+      <section class="login-left">
+        <img src="./img/logo.png" alt="Logo PetClin" />
+        <h1>PetClin</h1>
+        <p>Seu portal para o cuidado animal.</p>
+      </section>
+
+      <!-- Seção Direita: Formulário de Acesso -->
+      <section class="login-right">
+        <header class="login-header">
+          <h2>Bem-vindo!</h2>
+        </header>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="username">Usuário</label>
+
+            <div class="input-wrapper">
+              <input type="text" id="username" required />
+              <img
+                src="./img/icon-login.png"
+                class="input-icon-left"
+                alt="Ícone usuário"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Senha</label>
+            <div class="input-wrapper">
+              <input type="password" id="password" required />
+              <img
+                src="./img/icon-cadeado.png"
+                class="input-icon-left"
+                alt="Ícone senha"
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                class="btn-toggle"
+                aria-label="Mostrar senha"
+              >
+                <span class="icon-eye"></span>
+                <span class="icon-eye-off" style="display: none"></span>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Entrar</button>
+
+          <div class="login-links">
+            <a href="#">Esqueceu a senha?</a>
+            <a href="#">Criar nova conta</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="./js/session-auth.js"></script>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const user = document.getElementById("username").value;
+          const pass = document.getElementById("password").value;
+
+          if (user && pass) {
+            // Salva na sessão (limpa ao fechar o navegador)
+            sessionStorage.setItem("usuarioLogado", user);
+            window.location.href = "./view/home.html";
+          } else {
+            alert("Por favor, preencha usuário e senha.");
+          }
+        });
+    </script>
+  </body>
+</html>

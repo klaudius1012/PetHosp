@@ -1,208 +1,85 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const tbody = document.getElementById("tbody-atendimento");
-  const busca = document.getElementById("buscaAtendimento");
+  carregarInternacao();
 
-  const paginator = new Paginator(5, carregarAtendimentos);
-
-  let currentSortColumn = "dataHora";
-  let currentSortDirection = "desc";
-
-  // Evento: Ordenação ao clicar no cabeçalho
-  document.querySelectorAll("th[data-column]").forEach((th) => {
-    th.addEventListener("click", () => {
-      const column = th.getAttribute("data-column");
-      if (currentSortColumn === column) {
-        currentSortDirection = currentSortDirection === "asc" ? "desc" : "asc";
-      } else {
-        currentSortColumn = column;
-        currentSortDirection = "asc";
-      }
-      carregarAtendimentos();
-    });
-  });
-
-  // Evento: Busca
-  if (busca) {
-    busca.addEventListener("input", () => {
-      paginator.reset();
-      carregarAtendimentos();
-    });
+  // Filtro de busca
+  const buscaInput = document.getElementById("buscaInternacao");
+  if (buscaInput) {
+    buscaInput.addEventListener("input", carregarInternacao);
   }
+});
 
-  // Evento: Clique na tabela (Finalizar Atendimento)
-  tbody.addEventListener("click", (e) => {
-    if (e.target && e.target.classList.contains("btn-editar")) {
-      const id = e.target.getAttribute("data-id");
-      const atendimentos =
-        JSON.parse(localStorage.getItem("atendimentos")) || [];
-      const index = atendimentos.findIndex((a) => a.id === id);
+async function carregarInternacao() {
+  const tbody = document.getElementById("tbody-internacao");
+  const buscaInput = document.getElementById("buscaInternacao");
+  const termo = buscaInput ? buscaInput.value.toLowerCase() : "";
 
-      if (index !== -1) {
-        atendimentos[index].status = "Em Atendimento";
-        localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
-        window.location.href = `prescricao.html?id=${id}`;
-      }
-    }
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Carregando...</td></tr>';
 
-    if (e.target && e.target.classList.contains("btn-finalizar")) {
-      const id = e.target.getAttribute("data-id");
-      if (
-        confirm(
-          "Deseja finalizar o atendimento? O paciente sairá da lista de pendentes."
-        )
-      ) {
-        const atendimentos =
-          JSON.parse(localStorage.getItem("atendimentos")) || [];
-        const index = atendimentos.findIndex((a) => a.id === id);
+  try {
+    // Busca atendimentos com status "Em Atendimento"
+    let url = '/atendimentos/?status=Em Atendimento';
+    if (termo) url += `&q=${encodeURIComponent(termo)}`;
 
-        if (index !== -1) {
-          atendimentos[index].status = "Finalizado";
-          localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
-          alert("Atendimento finalizado com sucesso!");
-          carregarAtendimentos();
-        }
-      }
-    }
-  });
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Erro ao buscar internação");
 
-  // Carregar dados ao iniciar
-  carregarAtendimentos();
-
-  function carregarAtendimentos() {
-    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-    const animais = JSON.parse(localStorage.getItem("animais")) || [];
-    const tutores = JSON.parse(localStorage.getItem("tutores")) || [];
-    const termo = busca ? busca.value.toLowerCase() : "";
+    const lista = await response.json();
 
     tbody.innerHTML = "";
 
-    const filtrados = atendimentos.filter(
-      (a) =>
-        (a.status === "Aguardando" || a.status === "Em Atendimento") &&
-        ((a.tutor && a.tutor.toLowerCase().includes(termo)) ||
-          (a.animal && a.animal.toLowerCase().includes(termo)) ||
-          (a.veterinario && a.veterinario.toLowerCase().includes(termo)))
-    );
-
-    if (filtrados.length === 0) {
-      tbody.innerHTML =
-        '<tr><td colspan="8" style="text-align:center;">Nenhum atendimento encontrado.</td></tr>';
+    if (lista.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-message">Nenhum paciente internado/em atendimento no momento.</td></tr>`;
       return;
     }
 
-    // Ordenação Dinâmica
-    filtrados.sort((a, b) => {
-      let valA, valB;
+    // Ordenar por data (mais antigos primeiro, ou prioridade)
+    lista.sort((a, b) => (a.data_hora || "").localeCompare(b.data_hora || ""));
 
-      if (currentSortColumn === "idade") {
-        // Lógica específica para idade (baseada em data de nascimento)
-        valA = getNascimento(a, animais, tutores);
-        valB = getNascimento(b, animais, tutores);
-
-        if (!valA && !valB) return 0;
-        if (!valA) return 1;
-        if (!valB) return -1;
-      } else {
-        valA = (a[currentSortColumn] || "").toString().toLowerCase();
-        valB = (b[currentSortColumn] || "").toString().toLowerCase();
-      }
-
-      if (valA < valB) return currentSortDirection === "asc" ? -1 : 1;
-      if (valA > valB) return currentSortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    // Atualizar indicadores visuais no cabeçalho
-    document.querySelectorAll("th[data-column]").forEach((th) => {
-      th.textContent = th.textContent.replace(" ▲", "").replace(" ▼", "");
-      if (th.getAttribute("data-column") === currentSortColumn) {
-        th.textContent += currentSortDirection === "asc" ? " ▲" : " ▼";
-      }
-    });
-
-    const { data, totalPages } = paginator.paginate(filtrados);
-
-    data.forEach((a) => {
-      const [dataStr, horaStr] = (a.dataHora || "T").split("T");
+    lista.forEach((a) => {
       const tr = document.createElement("tr");
 
-      // Calcular Idade
-      let idadeStr = "--";
-      const tutorEncontrado = tutores.find((t) => t.nome === a.tutor);
-      let animalEncontrado = null;
-
-      if (tutorEncontrado) {
-        animalEncontrado = animais.find(
-          (an) => an.nome === a.animal && an.tutorId == tutorEncontrado.id
-        );
+      // Formatação de hora
+      let entrada = "--:--";
+      if (a.data_hora) {
+        const dateObj = new Date(a.data_hora);
+        entrada = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       }
-      if (!animalEncontrado) {
-        animalEncontrado = animais.find((an) => an.nome === a.animal);
-      }
-      if (animalEncontrado && animalEncontrado.nascimento) {
-        idadeStr = calcularIdade(animalEncontrado.nascimento);
-      }
-
-      if (a.prioridade === "Emergência") {
-        tr.classList.add("row-emergencia");
-      }
-
-      const prioridadeClass =
-        a.prioridade === "Emergência" ? "text-emergencia" : "";
 
       tr.innerHTML = `
-        <td>${dataStr.split("-").reverse().join("/")} ${horaStr}</td>
-        <td>${a.tutor}</td>
-        <td>${a.animal}</td>
-        <td>${idadeStr}</td>
-        <td>${a.veterinario}</td>
-        <td class="${prioridadeClass}">${a.prioridade || "-"}</td>
+        <td>${entrada}</td>
+        <td>${a.tutor_nome || a.tutor}</td>
+        <td>${a.animal_nome || a.animal}</td>
+        <td>${a.queixa || "-"}</td>
         <td>${a.status}</td>
         <td>
-          <button class="btn-editar" data-id="${a.id}">Prescrever</button>
-          <button class="btn-finalizar" data-id="${a.id}">Finalizar</button>
+          <button class="btn-icon" onclick="window.location.href='prescricao.html?id=${a.id}'" title="Prescrição">💊</button>
+          <button class="btn-icon" onclick="window.location.href='evolucoes.html?id=${a.id}'" title="Evolução">📋</button>
+          <button class="btn-icon" onclick="window.location.href='exames.html?id=${a.id}'" title="Exames">🔬</button>
+          <button class="btn-icon" onclick="darAlta(${a.id})" title="Dar Alta" style="color: green;">🏠</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
 
-    paginator.renderControls("pagination", totalPages);
+  } catch (error) {
+    console.error(error);
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red">Erro ao carregar dados.</td></tr>`;
   }
+}
 
-  function calcularIdade(dataNasc) {
-    const hoje = new Date();
-    const nasc = new Date(dataNasc);
-    let idade = hoje.getFullYear() - nasc.getFullYear();
-    const m = hoje.getMonth() - nasc.getMonth();
+window.darAlta = async function (id) {
+  if (confirm("Confirma a ALTA deste paciente? O atendimento será finalizado.")) {
+    try {
+      const response = await fetch(`/atendimentos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Finalizado' })
+      });
 
-    if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
-      idade--;
+      if (response.ok) carregarInternacao();
+      else alert("Erro ao dar alta.");
+    } catch (e) {
+      console.error(e);
     }
-
-    if (idade === 0) {
-      let meses =
-        (hoje.getFullYear() - nasc.getFullYear()) * 12 +
-        (hoje.getMonth() - nasc.getMonth());
-      if (hoje.getDate() < nasc.getDate()) meses--;
-      return `${meses} meses`;
-    }
-
-    return `${idade} anos`;
   }
-
-  function getNascimento(atendimento, animais, tutores) {
-    const tutorEncontrado = tutores.find((t) => t.nome === atendimento.tutor);
-    let animalEncontrado = null;
-
-    if (tutorEncontrado) {
-      animalEncontrado = animais.find(
-        (an) =>
-          an.nome === atendimento.animal && an.tutorId == tutorEncontrado.id
-      );
-    }
-    if (!animalEncontrado) {
-      animalEncontrado = animais.find((an) => an.nome === atendimento.animal);
-    }
-    return animalEncontrado ? animalEncontrado.nascimento : null;
-  }
-});
+};

@@ -31,92 +31,121 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarAtendimentos();
 });
 
-function carregarAtendimentos() {
+async function carregarAtendimentos() {
   const tbody = document.getElementById("tbody-recepcao");
-  tbody.innerHTML = "";
+  tbody.innerHTML =
+    '<tr><td colspan="7" style="text-align:center;">Carregando...</td></tr>';
 
-  const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
   const buscaInput = document.getElementById("buscaRecepcao");
   const dataFiltro = document.getElementById("dataFiltro");
 
   const termo = buscaInput ? buscaInput.value.toLowerCase() : "";
   const dataSelecionada = dataFiltro ? dataFiltro.value : "";
 
-  // Filtra:
-  // - Se tem data selecionada: Mostra TUDO daquela data (Histórico)
-  // - Se NÃO tem data: Mostra apenas pendentes (Fila de espera)
-  const lista = atendimentos.filter((a) => {
-    const dataAtendimento = a.dataHora ? a.dataHora.split("T")[0] : "";
-    const matchData = !dataSelecionada || dataAtendimento === dataSelecionada;
-    const isAberto = dataSelecionada
-      ? true
-      : ["Aguardando", "Em Atendimento"].includes(a.status);
-    const matchBusca =
-      (a.tutor && a.tutor.toLowerCase().includes(termo)) ||
-      (a.animal && a.animal.toLowerCase().includes(termo));
-    return isAberto && matchBusca && matchData;
-  });
+  try {
+    // Constrói a URL com filtros
+    let url = "/atendimentos/?";
+    if (dataSelecionada) url += `data=${dataSelecionada}&`;
+    if (termo) url += `q=${encodeURIComponent(termo)}&`;
 
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="empty-message">Nenhum atendimento aberto encontrado.</td></tr>`;
-    return;
-  }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Erro ao buscar atendimentos");
 
-  // Ordenar: Emergência primeiro, depois por hora
-  lista.sort((a, b) => {
-    if (a.prioridade === "Emergência" && b.prioridade !== "Emergência")
-      return -1;
-    if (a.prioridade !== "Emergência" && b.prioridade === "Emergência")
-      return 1;
-    return (a.dataHora || "").localeCompare(b.dataHora || "");
-  });
+    let lista = await response.json();
 
-  const { data, totalPages } = paginator.paginate(lista);
-
-  data.forEach((a) => {
-    const tr = document.createElement("tr");
-
-    // Destaque visual para Emergência
-    if (a.prioridade === "Emergência") {
-      tr.classList.add("row-emergencia");
+    // Lógica de visualização:
+    // Se NÃO tem data selecionada, mostramos apenas a "Fila de Espera" (Aguardando/Em Atendimento)
+    // Se TEM data, o backend já filtrou por data, mostramos tudo (Histórico)
+    if (!dataSelecionada) {
+      lista = lista.filter((a) =>
+        ["Aguardando", "Em Atendimento"].includes(a.status),
+      );
     }
 
-    const hora = a.dataHora ? a.dataHora.split("T")[1] : "--:--";
+    tbody.innerHTML = "";
 
-    tr.innerHTML = `
-      <td>${hora}</td>
-      <td>${a.tutor}</td>
-      <td>${a.animal}</td>
-      <td>${a.veterinario || "A definir"}</td>
-      <td class="${a.prioridade === "Emergência" ? "text-emergencia" : ""}">${
-      a.prioridade
-    }</td>
-      <td>${a.status}</td>
-      <td>
-        <button class="btn-editar" onclick="window.location.href='editar-atendimento.html?id=${
-          a.id
-        }'">Editar</button>
-        <button class="btn-finalizar" onclick="finalizarAtendimento('${
-          a.id
-        }')">Finalizar</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+    if (lista.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-message">Nenhum atendimento encontrado.</td></tr>`;
+      return;
+    }
 
-  paginator.renderControls("pagination", totalPages);
+    // Ordenação já vem do backend (Emergência > Data), mas garantimos aqui caso necessário
+    // O backend já ordena corretamente, então podemos confiar na ordem ou reforçar:
+    /*
+    lista.sort((a, b) => {
+      if (a.prioridade === "Emergência" && b.prioridade !== "Emergência") return -1;
+      if (a.prioridade !== "Emergência" && b.prioridade === "Emergência") return 1;
+      return (a.data_hora || "").localeCompare(b.data_hora || "");
+    });
+    */
+
+    const { data, totalPages } = paginator.paginate(lista);
+
+    data.forEach((a) => {
+      const tr = document.createElement("tr");
+
+      // Destaque visual para Emergência
+      if (a.prioridade === "Emergência") {
+        tr.classList.add("row-emergencia");
+      }
+
+      // Formatação de hora (backend retorna YYYY-MM-DDTHH:MM:SS ou similar)
+      let hora = "--:--";
+      if (a.data_hora) {
+        const dateObj = new Date(a.data_hora);
+        hora = dateObj.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Nomes vêm dos JOINs do backend (tutor_nome, animal_nome, veterinario_nome)
+      // Fallback para campos antigos se necessário, mas o backend envia _nome
+      const tutorNome = a.tutor_nome || a.tutor || "Desconhecido";
+      const animalNome = a.animal_nome || a.animal || "Desconhecido";
+      const vetNome = a.veterinario_nome || a.veterinario || "A definir";
+
+      tr.innerHTML = `
+        <td>${hora}</td>
+        <td>${tutorNome}</td>
+        <td>${animalNome}</td>
+        <td>${vetNome}</td>
+        <td class="${a.prioridade === "Emergência" ? "text-emergencia" : ""}">${a.prioridade}</td>
+        <td>${a.status}</td>
+        <td>
+          <button class="btn-editar" onclick="window.location.href='editar-atendimento.html?id=${a.id}'">Editar</button>
+          <button class="btn-finalizar" onclick="finalizarAtendimento(${a.id})">Finalizar</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    paginator.renderControls("pagination", totalPages);
+  } catch (error) {
+    console.error(error);
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red">Erro ao carregar atendimentos.</td></tr>`;
+  }
 }
 
-window.finalizarAtendimento = function (id) {
+window.finalizarAtendimento = async function (id) {
   if (
     confirm("Deseja finalizar este atendimento? Ele sairá da lista de abertos.")
   ) {
-    const atendimentos = JSON.parse(localStorage.getItem("atendimentos")) || [];
-    const index = atendimentos.findIndex((a) => a.id === id);
-    if (index !== -1) {
-      atendimentos[index].status = "Finalizado";
-      localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
-      carregarAtendimentos();
+    try {
+      const response = await fetch(`/atendimentos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Finalizado" }),
+      });
+
+      if (response.ok) {
+        carregarAtendimentos();
+      } else {
+        alert("Erro ao finalizar atendimento.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erro de conexão.");
     }
   }
 };

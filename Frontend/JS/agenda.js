@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formAgendamento");
   const busca = document.getElementById("buscaAgenda");
   let idEdicao = null;
+  let agendaData = []; // Armazena dados carregados para facilitar edição
 
   const paginator = new Paginator(5, carregarAgenda);
 
@@ -16,10 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnLimpar) {
     btnLimpar.addEventListener("click", () => {
-      if (confirm("Tem certeza que deseja limpar toda a agenda?")) {
-        localStorage.removeItem("agenda");
-        carregarAgenda();
-      }
+      alert("Utilize o banco de dados para limpar todos os registros.");
     });
   }
 

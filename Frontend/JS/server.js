@@ -8,11 +8,11 @@ const port = 3000;
 app.use(express.json());
 
 // Serve os arquivos do projeto (HTML, CSS, JS) estaticamente
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "..")));
 
 // Rota específica para salvar os dados no arquivo tutores.json
 app.put("/DATA/tutores.json", (req, res) => {
-  const filePath = path.join(__dirname, "DATA", "tutores.json");
+  const filePath = path.join(__dirname, "..", "DATA", "tutores.json");
 
   fs.writeFile(filePath, JSON.stringify(req.body, null, 2), (err) => {
     if (err) {
@@ -25,7 +25,7 @@ app.put("/DATA/tutores.json", (req, res) => {
 
 // Rota específica para salvar os dados no arquivo pet.json
 app.put("/DATA/pet.json", (req, res) => {
-  const filePath = path.join(__dirname, "DATA", "pet.json");
+  const filePath = path.join(__dirname, "..", "DATA", "pet.json");
 
   fs.writeFile(filePath, JSON.stringify(req.body, null, 2), (err) => {
     if (err) {
@@ -38,5 +38,5 @@ app.put("/DATA/pet.json", (req, res) => {
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
-  console.log(`Acesse: http://localhost:${port}/home.html`);
+  console.log(`Acesse: http://localhost:${port}/index.html`);
 });

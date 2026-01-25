@@ -46,7 +46,7 @@ def create_app():
     # Rotas para servir o Frontend
     @app.route('/')
     def index():
-        return send_from_directory('.', 'index.html')
+        return send_from_directory('frontend', 'index.html')
 
     @app.route('/frontend/<path:path>')
     def serve_frontend(path):

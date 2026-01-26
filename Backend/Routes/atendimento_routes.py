@@ -1,17 +1,14 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
 from backend.config.database import get_connection
+from flask_jwt_extended import jwt_required, get_jwt
 
 atendimento_bp = Blueprint('atendimento_bp', __name__)
 
-def login_required():
-    return 'user_id' in session
-
 @atendimento_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_atendimentos():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     # Filtros da query string
     data_filtro = request.args.get('data')
     busca = request.args.get('q') # Busca por nome de tutor ou animal
@@ -26,9 +23,9 @@ def listar_atendimentos():
         LEFT JOIN tutores t ON a.tutor_id = t.id
         LEFT JOIN animais an ON a.animal_id = an.id
         LEFT JOIN usuarios u ON a.veterinario_id = u.id
-        WHERE 1=1
+        WHERE a.clinica_id = ?
     '''
-    params = []
+    params = [clinica_id]
     
     if data_filtro:
         sql += ' AND date(a.data_hora) = ?'
@@ -55,10 +52,10 @@ def listar_atendimentos():
     return jsonify([dict(a) for a in atendimentos])
 
 @atendimento_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_atendimento():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
+    user_id = get_jwt().get('sub')
     data = request.get_json()
     
     if not data.get('tutor_id') or not data.get('animal_id'):
@@ -74,15 +71,15 @@ def criar_atendimento():
                 peso, temperatura, frequencia_cardiaca, frequencia_respiratoria,
                 tpc, mucosas, hidratacao, consciencia, queixa, observacoes,
                 alergias, vacinacao, ambiente, alimentacao
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            , clinica_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            data['tutor_id'], data['animal_id'], data.get('veterinario_id') or session.get('user_id'),
+            data['tutor_id'], data['animal_id'], data.get('veterinario_id') or user_id,
             data.get('data_hora'), data.get('status', 'Aguardando'), data.get('prioridade', 'Normal'),
             data.get('peso'), data.get('temperatura'), data.get('frequencia_cardiaca'),
             data.get('frequencia_respiratoria'), data.get('tpc'), data.get('mucosas'),
             data.get('hidratacao'), data.get('consciencia'), data.get('queixa'),
             data.get('observacoes'), data.get('alergias'), data.get('vacinacao'),
-            data.get('ambiente'), data.get('alimentacao')
+            data.get('ambiente'), data.get('alimentacao'), clinica_id
         ))
         conn.commit()
         atendimento_id = cursor.lastrowid
@@ -95,10 +92,9 @@ def criar_atendimento():
     return jsonify({'message': 'Atendimento criado', 'id': atendimento_id}), 201
 
 @atendimento_bp.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def obter_atendimento(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-        
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_connection()
     # Busca dados completos incluindo nomes
     sql = '''
@@ -107,9 +103,9 @@ def obter_atendimento(id):
         LEFT JOIN tutores t ON a.tutor_id = t.id
         LEFT JOIN animais an ON a.animal_id = an.id
         LEFT JOIN usuarios u ON a.veterinario_id = u.id
-        WHERE a.id = ?
+        WHERE a.id = ? AND a.clinica_id = ?
     '''
-    atendimento = conn.execute(sql, (id,)).fetchone()
+    atendimento = conn.execute(sql, (id, clinica_id)).fetchone()
     conn.close()
     
     if not atendimento:
@@ -118,10 +114,9 @@ def obter_atendimento(id):
     return jsonify(dict(atendimento))
 
 @atendimento_bp.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_atendimento(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     conn = get_connection()
     
@@ -146,7 +141,8 @@ def atualizar_atendimento(id):
         return jsonify({'message': 'Nada a atualizar'}), 200
         
     valores.append(id)
-    sql = f"UPDATE atendimentos SET {', '.join(set_clause)} WHERE id = ?"
+    valores.append(clinica_id)
+    sql = f"UPDATE atendimentos SET {', '.join(set_clause)} WHERE id = ? AND clinica_id = ?"
     
     try:
         conn.execute(sql, valores)

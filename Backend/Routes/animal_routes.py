@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
+from flask_jwt_extended import jwt_required, get_jwt
 
 animal_bp = Blueprint('animal_bp', __name__)
 
@@ -8,14 +9,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def login_required():
-    return 'user_id' in session
-
 @animal_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_animais():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     tutor_id = request.args.get('tutor_id')
     conn = get_db_connection()
     
@@ -24,22 +21,23 @@ def listar_animais():
             SELECT a.*, t.nome as tutor_nome 
             FROM animais a 
             LEFT JOIN tutores t ON a.tutor_id = t.id 
-            WHERE a.tutor_id = ?
-        ''', (tutor_id,)).fetchall()
+            WHERE a.tutor_id = ? AND a.clinica_id = ?
+        ''', (tutor_id, clinica_id)).fetchall()
     else:
         animais = conn.execute('''
             SELECT a.*, t.nome as tutor_nome 
             FROM animais a 
             LEFT JOIN tutores t ON a.tutor_id = t.id
-        ''').fetchall()
+            WHERE a.clinica_id = ?
+        ''', (clinica_id,)).fetchall()
     
     conn.close()
     return jsonify([dict(a) for a in animais])
 
 @animal_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_animal():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
+    clinica_id = get_jwt().get('clinica_id')
     
     data = request.get_json()
     
@@ -54,15 +52,15 @@ def criar_animal():
         cursor.execute('''
             INSERT INTO animais (
                 tutor_id, nome, especie, raca, sexo, nascimento, peso, 
-                porte, condicao_reprodutiva, alergias, vacinacao, 
+                porte, condicao_reprodutiva, alergias, vacinacao,
                 ambiente, alimentacao, observacoes, foto
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            , clinica_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data['tutor_id'], data['nome'], data['especie'], data.get('raca'), 
             data.get('sexo'), data.get('nascimento'), data.get('peso'),
             data.get('porte'), data.get('condicao_reprodutiva'), data.get('alergias'),
             data.get('vacinacao'), data.get('ambiente'), data.get('alimentacao'),
-            data.get('observacoes'), data.get('foto')
+            data.get('observacoes'), data.get('foto'), clinica_id
         ))
         conn.commit()
         animal_id = cursor.lastrowid
@@ -75,12 +73,11 @@ def criar_animal():
     return jsonify({'message': 'Animal cadastrado com sucesso', 'id': animal_id}), 201
 
 @animal_bp.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def obter_animal(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-        
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_db_connection()
-    animal = conn.execute('SELECT * FROM animais WHERE id = ?', (id,)).fetchone()
+    animal = conn.execute('SELECT * FROM animais WHERE id = ? AND clinica_id = ?', (id, clinica_id)).fetchone()
     conn.close()
     
     if animal is None:
@@ -89,9 +86,9 @@ def obter_animal(id):
     return jsonify(dict(animal))
 
 @animal_bp.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_animal(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
+    clinica_id = get_jwt().get('clinica_id')
     
     data = request.get_json()
     conn = get_db_connection()
@@ -114,7 +111,8 @@ def atualizar_animal(id):
         return jsonify({'message': 'Nada a atualizar'}), 200
         
     valores.append(id)
-    sql = f"UPDATE animais SET {', '.join(set_clause)} WHERE id = ?"
+    valores.append(clinica_id)
+    sql = f"UPDATE animais SET {', '.join(set_clause)} WHERE id = ? AND clinica_id = ?"
     
     conn.execute(sql, valores)
     conn.commit()
@@ -123,12 +121,11 @@ def atualizar_animal(id):
     return jsonify({'message': 'Animal atualizado com sucesso'})
 
 @animal_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def deletar_animal(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-        
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_db_connection()
-    conn.execute('DELETE FROM animais WHERE id = ?', (id,))
+    conn.execute('DELETE FROM animais WHERE id = ? AND clinica_id = ?', (id, clinica_id))
     conn.commit()
     conn.close()
     

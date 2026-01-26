@@ -65,7 +65,7 @@ def login():
             session['user_tipo'] = user['tipo']
             session['clinica_id'] = user['clinica_id']
             
-            access_token = create_access_token(identity=user['id'])
+            access_token = create_access_token(identity=user['id'], additional_claims={'clinica_id': user['clinica_id']})
             
             return jsonify({
                 'message': 'Login realizado',

@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
+from flask_jwt_extended import jwt_required, get_jwt
 
 classe_terapeutica_bp = Blueprint('classe_terapeutica_bp', __name__)
 
@@ -8,25 +9,20 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def login_required():
-    return 'user_id' in session
-
 @classe_terapeutica_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_classes():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_db_connection()
-    classes = conn.execute('SELECT * FROM classes_terapeuticas ORDER BY nome').fetchall()
+    classes = conn.execute('SELECT * FROM classes_terapeuticas WHERE clinica_id = ? ORDER BY nome', (clinica_id,)).fetchall()
     conn.close()
     
     return jsonify([dict(c) for c in classes])
 
 @classe_terapeutica_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_classe():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     
     if not data.get('nome'):
@@ -34,8 +30,8 @@ def criar_classe():
 
     conn = get_db_connection()
     try:
-        conn.execute('INSERT INTO classes_terapeuticas (nome, descricao) VALUES (?, ?)',
-                     (data['nome'], data.get('descricao')))
+        conn.execute('INSERT INTO classes_terapeuticas (nome, descricao, clinica_id) VALUES (?, ?, ?)',
+                     (data['nome'], data.get('descricao'), clinica_id))
         conn.commit()
         classe_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
     except sqlite3.IntegrityError:
@@ -50,10 +46,9 @@ def criar_classe():
     return jsonify({'message': 'Classe criada', 'id': classe_id}), 201
 
 @classe_terapeutica_bp.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_classe(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     conn = get_db_connection()
     
@@ -61,13 +56,14 @@ def atualizar_classe(id):
     set_clause = [f"{c} = ?" for c in campos if c in data]
     valores = [data[c] for c in campos if c in data]
     valores.append(id)
+    valores.append(clinica_id)
     
     if not set_clause:
         conn.close()
         return jsonify({'message': 'Nada a atualizar'}), 200
         
     try:
-        conn.execute(f"UPDATE classes_terapeuticas SET {', '.join(set_clause)} WHERE id = ?", valores)
+        conn.execute(f"UPDATE classes_terapeuticas SET {', '.join(set_clause)} WHERE id = ? AND clinica_id = ?", valores)
         conn.commit()
     except sqlite3.IntegrityError:
         conn.close()
@@ -81,12 +77,11 @@ def atualizar_classe(id):
     return jsonify({'message': 'Classe atualizada'})
 
 @classe_terapeutica_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def deletar_classe(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-        
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_db_connection()
-    conn.execute('DELETE FROM classes_terapeuticas WHERE id = ?', (id,))
+    conn.execute('DELETE FROM classes_terapeuticas WHERE id = ? AND clinica_id = ?', (id, clinica_id))
     conn.commit()
     conn.close()
     

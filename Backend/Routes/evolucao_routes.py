@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
+from flask_jwt_extended import jwt_required, get_jwt
 
 evolucao_bp = Blueprint('evolucao_bp', __name__)
 
@@ -8,14 +9,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def login_required():
-    return 'user_id' in session
-
 @evolucao_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_evolucoes():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     atendimento_id = request.args.get('atendimento_id')
     if not atendimento_id:
         return jsonify({'error': 'Atendimento ID necessário'}), 400
@@ -26,19 +23,19 @@ def listar_evolucoes():
         SELECT e.*, u.nome as veterinario_nome 
         FROM evolucoes e
         LEFT JOIN usuarios u ON e.veterinario_id = u.id
-        WHERE e.atendimento_id = ?
+        WHERE e.atendimento_id = ? AND e.clinica_id = ?
         ORDER BY e.data_hora DESC
     '''
-    evolucoes = conn.execute(sql, (atendimento_id,)).fetchall()
+    evolucoes = conn.execute(sql, (atendimento_id, clinica_id)).fetchall()
     conn.close()
     
     return jsonify([dict(e) for e in evolucoes])
 
 @evolucao_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_evolucao():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
+    user_id = get_jwt().get('sub') # 'sub' is the identity (user id)
     data = request.get_json()
     
     if not data.get('atendimento_id') or not data.get('descricao'):
@@ -47,13 +44,14 @@ def criar_evolucao():
     conn = get_db_connection()
     try:
         conn.execute('''
-            INSERT INTO evolucoes (atendimento_id, veterinario_id, descricao, tipo)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO evolucoes (atendimento_id, veterinario_id, descricao, tipo, clinica_id)
+            VALUES (?, ?, ?, ?, ?)
         ''', (
             data['atendimento_id'], 
-            session.get('user_id'), 
+            user_id, 
             data['descricao'],
-            data.get('tipo', 'Evolução')
+            data.get('tipo', 'Evolução'),
+            clinica_id
         ))
         conn.commit()
         evolucao_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]

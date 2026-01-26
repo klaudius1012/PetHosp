@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
 from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt
 
 financeiro_bp = Blueprint('financeiro_bp', __name__)
 
@@ -9,14 +10,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def login_required():
-    return 'user_id' in session
-
 @financeiro_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_lancamentos():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data_inicio = request.args.get('inicio')
     data_fim = request.args.get('fim')
     tipo = request.args.get('tipo')
@@ -27,9 +24,9 @@ def listar_lancamentos():
         SELECT f.*, t.nome as tutor_nome 
         FROM financeiro f
         LEFT JOIN tutores t ON f.tutor_id = t.id
-        WHERE 1=1
+        WHERE f.clinica_id = ?
     '''
-    params = []
+    params = [clinica_id]
     
     if data_inicio and data_fim:
         sql += ' AND date(f.data_vencimento) BETWEEN ? AND ?'
@@ -51,10 +48,9 @@ def listar_lancamentos():
     return jsonify([dict(l) for l in lancamentos])
 
 @financeiro_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_lancamento():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     
     if not data.get('descricao') or not data.get('valor') or not data.get('tipo'):
@@ -66,13 +62,13 @@ def criar_lancamento():
             INSERT INTO financeiro (
                 tipo, categoria, descricao, valor, data_vencimento, 
                 data_pagamento, status, metodo_pagamento, tutor_id, 
-                atendimento_id, observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                atendimento_id, observacoes, clinica_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data['tipo'], data.get('categoria'), data['descricao'], data['valor'],
             data.get('data_vencimento'), data.get('data_pagamento'), 
             data.get('status', 'Pendente'), data.get('metodo_pagamento'),
-            data.get('tutor_id'), data.get('atendimento_id'), data.get('observacoes')
+            data.get('tutor_id'), data.get('atendimento_id'), data.get('observacoes'), clinica_id
         ))
         conn.commit()
         lanc_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
@@ -85,10 +81,9 @@ def criar_lancamento():
     return jsonify({'message': 'Lançamento criado', 'id': lanc_id}), 201
 
 @financeiro_bp.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_lancamento(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     conn = get_db_connection()
     
@@ -103,9 +98,10 @@ def atualizar_lancamento(id):
         return jsonify({'message': 'Nada a atualizar'}), 200
 
     valores.append(id)
+    valores.append(clinica_id)
     
     try:
-        conn.execute(f"UPDATE financeiro SET {', '.join(set_clause)} WHERE id = ?", valores)
+        conn.execute(f"UPDATE financeiro SET {', '.join(set_clause)} WHERE id = ? AND clinica_id = ?", valores)
         conn.commit()
     except Exception as e:
         conn.rollback()
@@ -116,12 +112,11 @@ def atualizar_lancamento(id):
     return jsonify({'message': 'Lançamento atualizado'})
 
 @financeiro_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def deletar_lancamento(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-        
+    clinica_id = get_jwt().get('clinica_id')
     conn = get_db_connection()
-    conn.execute('DELETE FROM financeiro WHERE id = ?', (id,))
+    conn.execute('DELETE FROM financeiro WHERE id = ? AND clinica_id = ?', (id, clinica_id))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Lançamento excluído'})

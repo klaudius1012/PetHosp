@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 import sqlite3
 from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt
 
 estoque_bp = Blueprint('estoque_bp', __name__)
 
@@ -9,21 +10,17 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def login_required():
-    return 'user_id' in session
-
 @estoque_bp.route('/', methods=['GET'])
+@jwt_required()
 def listar_produtos():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     busca = request.args.get('q')
     categoria = request.args.get('categoria')
     baixo_estoque = request.args.get('baixo_estoque')
     
     conn = get_db_connection()
-    sql = 'SELECT * FROM produtos WHERE 1=1'
-    params = []
+    sql = 'SELECT * FROM produtos WHERE clinica_id = ?'
+    params = [clinica_id]
     
     if busca:
         termo = f'%{busca}%'
@@ -67,10 +64,9 @@ def listar_produtos():
     return jsonify(lista)
 
 @estoque_bp.route('/', methods=['POST'])
+@jwt_required()
 def criar_produto():
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     
     if not data.get('nome'):
@@ -82,15 +78,15 @@ def criar_produto():
             INSERT INTO produtos (
                 nome, categoria, classe_terapeutica, principio_ativo, concentracao,
                 unidade_medida, apresentacao, lote, validade, estoque_atual,
-                estoque_minimo, valor_custo, valor_venda, fornecedor, observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                estoque_minimo, valor_custo, valor_venda, fornecedor, observacoes, clinica_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data['nome'], data.get('categoria'), data.get('classe_terapeutica'),
             data.get('principio_ativo'), data.get('concentracao'), data.get('unidade_medida'),
             data.get('apresentacao'), data.get('lote'), data.get('validade'),
             data.get('estoque_atual', 0), data.get('estoque_minimo', 5),
             data.get('valor_custo'), data.get('valor_venda'),
-            data.get('fornecedor'), data.get('observacoes')
+            data.get('fornecedor'), data.get('observacoes'), clinica_id
         ))
         conn.commit()
         prod_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
@@ -103,10 +99,9 @@ def criar_produto():
     return jsonify({'message': 'Produto cadastrado', 'id': prod_id}), 201
 
 @estoque_bp.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_produto(id):
-    if not login_required():
-        return jsonify({'error': 'Não autorizado'}), 401
-    
+    clinica_id = get_jwt().get('clinica_id')
     data = request.get_json()
     conn = get_db_connection()
     
@@ -117,8 +112,9 @@ def atualizar_produto(id):
     set_clause = [f"{c} = ?" for c in campos if c in data]
     valores = [data[c] for c in campos if c in data]
     valores.append(id)
+    valores.append(clinica_id)
     
-    conn.execute(f"UPDATE produtos SET {', '.join(set_clause)} WHERE id = ?", valores)
+    conn.execute(f"UPDATE produtos SET {', '.join(set_clause)} WHERE id = ? AND clinica_id = ?", valores)
     conn.commit()
     conn.close()
     return jsonify({'message': 'Produto atualizado'})

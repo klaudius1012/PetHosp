@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS clinicas (
 -- Tabela de Usuários (Login)
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT DEFAULT 'admin',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 -- Tabela de Veterinários
 CREATE TABLE IF NOT EXISTS veterinarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     crmv TEXT,
     telefone TEXT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS veterinarios (
 -- Tabela de Tutores
 CREATE TABLE IF NOT EXISTS tutores (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     cpf TEXT,
     telefone TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS tutores (
 -- Tabela de Animais
 CREATE TABLE IF NOT EXISTS animais (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     especie TEXT,
     raca TEXT,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS animais (
 -- Tabela de Atendimentos
 CREATE TABLE IF NOT EXISTS atendimentos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     animal_id INTEGER NOT NULL,
     tutor_id INTEGER NOT NULL,
     veterinario_id INTEGER,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS atendimentos (
 -- Tabelas Associadas ao Atendimento
 CREATE TABLE IF NOT EXISTS evolucoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     atendimento_id INTEGER NOT NULL,
     data_hora TEXT,
     descricao TEXT,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS evolucoes (
 
 CREATE TABLE IF NOT EXISTS exames (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     atendimento_id INTEGER NOT NULL,
     tipo TEXT,
     prioridade TEXT,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS exames (
 
 CREATE TABLE IF NOT EXISTS procedimentos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     atendimento_id INTEGER NOT NULL,
     nome TEXT,
     detalhes TEXT,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS procedimentos (
 
 CREATE TABLE IF NOT EXISTS afericoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     atendimento_id INTEGER NOT NULL,
     data_hora TEXT,
     temperatura REAL,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS afericoes (
 -- Financeiro
 CREATE TABLE IF NOT EXISTS lancamentos_financeiros (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     descricao TEXT NOT NULL,
     valor REAL NOT NULL,
     tipo TEXT NOT NULL, -- Receita ou Despesa
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS lancamentos_financeiros (
 -- Prescrições
 CREATE TABLE IF NOT EXISTS prescricoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     atendimento_id INTEGER NOT NULL,
     data TEXT,
     observacoes TEXT,
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS prescricoes (
 
 CREATE TABLE IF NOT EXISTS kits_prescricao (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    clinica_id INTEGER,
+    clinica_id INTEGER NOT NULL,
     nome TEXT NOT NULL,
     medicamentos TEXT, -- Armazenado como JSON string
     FOREIGN KEY (clinica_id) REFERENCES clinicas (id)

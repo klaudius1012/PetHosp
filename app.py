@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, session, redirect
 from flask_jwt_extended import JWTManager
 from backend.models import db
 from backend.routes.animal_routes import animal_bp
@@ -13,6 +13,7 @@ from backend.routes.estoque_routes import estoque_bp
 from backend.routes.classe_terapeutica_routes import classe_terapeutica_bp
 from backend.routes.evolucao_routes import evolucao_bp
 from backend.routes.internacao_routes import internacao_bp
+from backend.routes.clinica_routes import clinica_bp
 import os
 
 def create_app():
@@ -24,10 +25,15 @@ def create_app():
     db_path = os.path.join(base_dir, 'backend', 'database', 'petclin.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'super-secret-key-change-this'
     app.config['JWT_SECRET_KEY'] = 'super-secret-key-change-this'
 
     db.init_app(app)
     jwt = JWTManager(app)
+
+    # Cria todas as tabelas do banco de dados automaticamente se não existirem
+    with app.app_context():
+        db.create_all()
 
     # Registrar Rotas da API
     app.register_blueprint(animal_bp, url_prefix='/animais')
@@ -42,11 +48,14 @@ def create_app():
     app.register_blueprint(classe_terapeutica_bp, url_prefix='/classes-terapeuticas')
     app.register_blueprint(evolucao_bp, url_prefix='/evolucoes')
     app.register_blueprint(internacao_bp, url_prefix='/internacoes')
+    app.register_blueprint(clinica_bp, url_prefix='/clinicas')
 
     # Rotas para servir o Frontend
     @app.route('/')
     def index():
-        return send_from_directory('frontend', 'index.html')
+        if 'user_id' not in session:
+            return redirect('/index.html')
+        return send_from_directory('frontend/view', 'home.html')
 
     @app.route('/frontend/<path:path>')
     def serve_frontend(path):
@@ -54,6 +63,14 @@ def create_app():
 
     @app.route('/<path:filename>')
     def serve_root_files(filename):
+        if filename == 'home.html' and 'user_id' not in session:
+            return redirect('/index.html')
+        if os.path.exists(os.path.join('frontend', 'view', filename)):
+            return send_from_directory('frontend/view', filename)
+        if os.path.exists(os.path.join('frontend', filename)):
+            return send_from_directory('frontend', filename)
+        if filename == 'index.html':
+            return send_from_directory('frontend', filename)
         return send_from_directory('.', filename)
 
     return app

@@ -49,7 +49,7 @@ async function carregarTutores(filtro = "") {
         <td>${t.telefone || "-"}</td>
         <td>${t.email || "-"}</td>
         <td>
-          <button class="btn-icon" onclick="window.location.href='editar-tutor.html?id=${t.id}'">✏️</button>
+          <button class="btn-icon" onclick="window.location.href='cadastro_tutor.html?id=${t.id}'">✏️</button>
         </td>
       `;
       tbody.appendChild(tr);

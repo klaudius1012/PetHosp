@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Limpa tokens antigos ao carregar a página de login para evitar conflitos
+  // com a sessão do servidor e loops de redirecionamento.
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+
   // --- 1. Lógica de Mostrar/Esconder Senha ---
   const btnToggleSenha = document.getElementById("btnToggleSenha");
   const inputSenha = document.getElementById("senha");
@@ -45,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           localStorage.setItem("token", data.access_token);
           localStorage.setItem("usuario", JSON.stringify(data.user));
-          window.location.href = "recepcao.html"; // Redireciona para a tela inicial
+          window.location.href = "home.html"; // Redireciona para a tela inicial
         } else {
           if (msgErro) msgErro.textContent = data.error || "Erro ao entrar.";
           else alert(data.error || "Erro ao entrar.");

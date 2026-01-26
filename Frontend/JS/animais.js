@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (buscaInput) {
     buscaInput.addEventListener("input", carregarAnimais);
   }
+
+  const formAnimal = document.getElementById("formAnimal");
+  if (formAnimal) {
+    formAnimal.addEventListener("submit", salvarAnimal);
+  }
 });
 
 async function carregarAnimais() {
@@ -65,6 +70,47 @@ async function carregarAnimais() {
     console.error(error);
     tbody.innerHTML =
       '<tr><td colspan="5" style="text-align:center; color:red">Erro ao carregar dados.</td></tr>';
+  }
+}
+
+async function salvarAnimal(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("animalId")?.value;
+  // Coleta dados do formulário
+  const dados = {
+    nome: document.getElementById("nome").value,
+    especie: document.getElementById("especie").value,
+    raca: document.getElementById("raca").value,
+    sexo: document.getElementById("sexo").value,
+    peso: document.getElementById("peso").value,
+    nascimento: document.getElementById("nascimento").value,
+    tutor_id: document.getElementById("tutor_id").value // Select de tutores
+  };
+
+  const metodo = id ? "PUT" : "POST";
+  const url = id ? `/animais/${id}` : "/animais";
+
+  try {
+    const response = await fetch(url, {
+      method: metodo,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify(dados)
+    });
+
+    if (response.ok) {
+      alert("Animal salvo com sucesso!");
+      window.location.href = "animais.html";
+    } else {
+      const err = await response.json();
+      alert(err.error || "Erro ao salvar animal.");
+    }
+  } catch (error) {
+    console.error("Erro:", error);
+    alert("Erro de conexão.");
   }
 }
 

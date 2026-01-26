@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -11,23 +11,26 @@
       <aside class="sidebar">
         <h3>Serviços</h3>
         <ul id="listaServicos">
-          <li onclick="window.location.href='home.html'">Dashboard</li>
-          <li onclick="window.location.href='agenda.html'">Agenda</li>
-          <li onclick="window.location.href='recepcao.html'">Recepção</li>
-          <li onclick="window.location.href='tutores.html'">Tutores</li>
-          <li onclick="window.location.href='animais.html'">Animais</li>
-          <li onclick="window.location.href='internacao.html'">Internação</li>
-          <li onclick="window.location.href='vacinas.html'">Vacinas</li>
+          <li onclick="window.location.href = 'clinicas.html'">Clínicas</li>
+          <li onclick="window.location.href = 'home.html'">Dashboard</li>
+          <li onclick="window.location.href = 'agenda.html'">Agenda</li>
+          <li onclick="window.location.href = 'recepcao.html'">Recepção</li>
+          <li onclick="window.location.href = 'tutores.html'">Tutores</li>
+          <li onclick="window.location.href = 'animais.html'">Animais</li>
+          <li onclick="window.location.href = 'internacao.html'">Internação</li>
+          <li onclick="window.location.href = 'vacinas.html'">Vacinas</li>
         </ul>
       </aside>
 
       <section class="content-area">
-        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">☰</button>
+        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">
+          ☰
+        </button>
         <div id="conteudoServico">
           <article>
             <button
               class="btn_voltar"
-              onclick="window.location.href='internacao.html'"
+              onclick="window.location.href = 'internacao.html'"
             >
               &#8592; Voltar para Internação
             </button>
@@ -139,37 +142,50 @@
             <div class="actions-container">
               <button
                 class="btn btn-primary"
-                onclick="window.location.href='nova-prescricao.html'"
+                onclick="window.location.href = 'nova-prescricao.html'"
               >
                 ➕ Nova Prescrição
               </button>
               <button
                 class="btn btn-neutral"
-                onclick="window.location.href='evolucoes.html' + window.location.search"
+                onclick="
+                  window.location.href =
+                    'evolucoes.html' + window.location.search
+                "
               >
                 📋 Evolução
               </button>
               <button
                 class="btn btn-neutral"
-                onclick="window.location.href='exames.html' + window.location.search"
+                onclick="
+                  window.location.href = 'exames.html' + window.location.search
+                "
               >
                 🔬 Exames
               </button>
               <button
                 class="btn btn-neutral"
-                onclick="window.location.href='procedimentos.html' + window.location.search"
+                onclick="
+                  window.location.href =
+                    'procedimentos.html' + window.location.search
+                "
               >
                 💉 Procedimentos
               </button>
               <button
                 class="btn btn-neutral"
-                onclick="window.location.href='afericoes.html' + window.location.search"
+                onclick="
+                  window.location.href =
+                    'afericoes.html' + window.location.search
+                "
               >
                 🌡️ Aferições
               </button>
               <button
                 class="btn btn-neutral"
-                onclick="window.location.href='anexos.html' + window.location.search"
+                onclick="
+                  window.location.href = 'anexos.html' + window.location.search
+                "
               >
                 📎 Anexos
               </button>
@@ -200,7 +216,7 @@
           <img
             src="../img/logo.png"
             alt="Logo"
-            onerror="this.style.display='none'"
+            onerror="this.style.display = 'none'"
           />
           <h1>PetClin</h1>
         </div>

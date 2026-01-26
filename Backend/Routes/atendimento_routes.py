@@ -1,12 +1,8 @@
 from flask import Blueprint, request, jsonify, session
 import sqlite3
+from backend.config.database import get_connection
 
 atendimento_bp = Blueprint('atendimento_bp', __name__)
-
-def get_db_connection():
-    conn = sqlite3.connect('backend/database/petclin.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 def login_required():
     return 'user_id' in session
@@ -21,7 +17,7 @@ def listar_atendimentos():
     busca = request.args.get('q') # Busca por nome de tutor ou animal
     status = request.args.get('status')
     
-    conn = get_db_connection()
+    conn = get_connection()
     
     # Query base com JOIN para trazer nomes
     sql = '''
@@ -68,7 +64,7 @@ def criar_atendimento():
     if not data.get('tutor_id') or not data.get('animal_id'):
         return jsonify({'error': 'Tutor e Animal são obrigatórios'}), 400
 
-    conn = get_db_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     
     try:
@@ -103,7 +99,7 @@ def obter_atendimento(id):
     if not login_required():
         return jsonify({'error': 'Não autorizado'}), 401
         
-    conn = get_db_connection()
+    conn = get_connection()
     # Busca dados completos incluindo nomes
     sql = '''
         SELECT a.*, t.nome as tutor_nome, an.nome as animal_nome, u.nome as veterinario_nome
@@ -127,7 +123,7 @@ def atualizar_atendimento(id):
         return jsonify({'error': 'Não autorizado'}), 401
     
     data = request.get_json()
-    conn = get_db_connection()
+    conn = get_connection()
     
     # Lista de campos permitidos para atualização
     campos_permitidos = [

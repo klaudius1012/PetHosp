@@ -1,13 +1,9 @@
 from flask import Blueprint, request, jsonify, session
 import sqlite3
 import json
+from backend.config.database import get_connection
 
 prescricao_bp = Blueprint('prescricao_bp', __name__)
-
-def get_db_connection():
-    conn = sqlite3.connect('backend/database/petclin.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 def login_required():
     return 'user_id' in session
@@ -21,7 +17,7 @@ def listar_prescricoes():
     
     atendimento_id = request.args.get('atendimento_id')
     
-    conn = get_db_connection()
+    conn = get_connection()
     sql = '''
         SELECT p.*, u.nome as veterinario_nome 
         FROM prescricoes p
@@ -57,7 +53,7 @@ def obter_prescricao(id):
     if not login_required():
         return jsonify({'error': 'Não autorizado'}), 401
         
-    conn = get_db_connection()
+    conn = get_connection()
     prescricao = conn.execute('SELECT * FROM prescricoes WHERE id = ?', (id,)).fetchone()
     conn.close()
     
@@ -83,7 +79,7 @@ def criar_prescricao():
     medicamentos_json = json.dumps(data['medicamentos'])
     veterinario_id = session.get('user_id')
 
-    conn = get_db_connection()
+    conn = get_connection()
     try:
         conn.execute('''
             INSERT INTO prescricoes (atendimento_id, veterinario_id, observacoes, medicamentos)
@@ -106,7 +102,7 @@ def listar_kits():
     if not login_required():
         return jsonify({'error': 'Não autorizado'}), 401
         
-    conn = get_db_connection()
+    conn = get_connection()
     # Lista kits globais ou do próprio veterinário
     kits = conn.execute('''
         SELECT * FROM prescricao_kits 
@@ -140,7 +136,7 @@ def criar_kit():
     medicamentos_json = json.dumps(data['medicamentos'])
     veterinario_id = session.get('user_id')
     
-    conn = get_db_connection()
+    conn = get_connection()
     conn.execute('INSERT INTO prescricao_kits (nome, medicamentos, veterinario_id) VALUES (?, ?, ?)',
                  (data['nome'], medicamentos_json, veterinario_id))
     conn.commit()
@@ -154,7 +150,7 @@ def deletar_kit(id):
     if not login_required():
         return jsonify({'error': 'Não autorizado'}), 401
         
-    conn = get_db_connection()
+    conn = get_connection()
     # Só permite deletar se for dono do kit
     kit = conn.execute('SELECT veterinario_id FROM prescricao_kits WHERE id = ?', (id,)).fetchone()
     

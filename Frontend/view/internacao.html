@@ -3,70 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="../../favicon.png" />
-    <title>Internação - PetClin</title>
-    <link rel="stylesheet" href="../css/global.css" />
-    <link rel="stylesheet" href="../css/sidebar.css" />
-    <link rel="stylesheet" href="../css/header.css" />
-    <link rel="stylesheet" href="../css/table.css" />
+    <title>Internação</title>
+
+    <link rel="stylesheet" href="../CSS/internacao.css" />
   </head>
+
   <body>
-    <aside class="sidebar">
-      <header class="sidebar-header">
-        <img src="../img/logo.png" alt="Logo" class="sidebar-logo" />
-        <span>PetClin</span>
-      </header>
-      <nav>
-        <ul>
-          <li onclick="window.location.href = 'home.html'">🏠 Home</li>
-          <li onclick="window.location.href = 'recepcao.html'">🛎️ Recepção</li>
-          <li onclick="window.location.href = 'agenda.html'">🗓️ Agenda</li>
-          <li class="active" onclick="window.location.href = 'internacao.html'">
-            🏥 Internação
-          </li>
-          <li onclick="window.location.href = 'tutores.html'">👥 Tutores</li>
-          <li onclick="window.location.href = 'animais.html'">🐾 Animais</li>
-          <li onclick="window.location.href = 'estoque.html'">📦 Estoque</li>
-          <li onclick="window.location.href = 'financeiro.html'">
-            💰 Financeiro
-          </li>
-          <li id="logoutBtn">🚪 Sair</li>
+    <main class="login-card card">
+      <!-- Coluna Esquerda: Lista de Serviços -->
+      <aside class="sidebar">
+        <h3>Serviços</h3>
+        <ul id="listaServicos">
+          <li onclick="window.location.href = 'clinicas.html'">Clínicas</li>
+          <li onclick="window.location.href = 'home.html'">Dashboard</li>
+          <li onclick="window.location.href = 'agenda.html'">Agenda</li>
+          <li onclick="window.location.href = 'recepcao.html'">Recepção</li>
+          <li onclick="window.location.href = 'tutores.html'">Tutores</li>
+          <li onclick="window.location.href = 'animais.html'">Animais</li>
+          <li onclick="window.location.href = 'internacao.html'">Internação</li>
+          <li onclick="window.location.href = 'vacinas.html'">Vacinas</li>
         </ul>
-      </nav>
-    </aside>
+      </aside>
 
-    <main class="main-content">
-      <header class="main-header">
-        <button id="menuBtn" class="menu-btn">☰</button>
-        <h1>Internação</h1>
-      </header>
+      <!-- Coluna Direita: Conteúdo -->
+      <section class="content-area">
+        <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">
+          ☰
+        </button>
+        <div id="conteudoServico" role="tabpanel">
+          <!-- Módulo: Atendimento -->
+          <article id="view-atendimento">
+            <h2>Atendimentos Pendentes</h2>
 
-      <div class="content-body">
-        <div class="toolbar">
-          <input
-            type="text"
-            id="buscaInternacao"
-            placeholder="Buscar por animal ou tutor..."
-          />
+            <div class="form-group search-container">
+              <input
+                type="search"
+                id="buscaAtendimento"
+                placeholder="Buscar por tutor, animal ou veterinário..."
+                class="form-control"
+              />
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th data-column="dataHora" class="sortable-header">
+                    Data/Hora
+                  </th>
+                  <th data-column="tutor" class="sortable-header">Tutor</th>
+                  <th data-column="animal" class="sortable-header">Animal</th>
+                  <th data-column="idade" class="sortable-header">Idade</th>
+                  <th data-column="veterinario" class="sortable-header">
+                    Veterinário
+                  </th>
+                  <th data-column="prioridade" class="sortable-header">
+                    Prioridade
+                  </th>
+                  <th data-column="status" class="sortable-header">Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-atendimento">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+            <div id="pagination" class="pagination"></div>
+          </article>
         </div>
-
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Animal</th>
-                <th>Tutor</th>
-                <th>Data de Entrada</th>
-                <th>Veterinário</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-internacao"></tbody>
-          </table>
-        </div>
-      </div>
+      </section>
     </main>
-    <script src="../js/session-auth.js"></script>
-    <script src="../js/internacao.js"></script>
+
+    <!-- Botão de Logout -->
+    <button id="logoutBtn" class="btn-btn-logout">Sair</button>
+
+    <!-- JS -->
+    <script src="../JS/session-auth.js"></script>
+    <script src="../JS/pagination.js"></script>
+    <script src="../JS/internacao.js"></script>
   </body>
 </html>

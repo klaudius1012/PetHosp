@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="../CSS/home.css" />
+    <title>Clínicas - PetClin</title>
+    <link rel="stylesheet" href="../css/home.css" />
+    <link rel="stylesheet" href="../css/clinicas.css" />
   </head>
-
   <body>
     <main class="login-card card">
-      <!-- Coluna Esquerda: Lista de Serviços -->
+      <!-- Sidebar -->
       <aside class="sidebar">
         <h3>Serviços</h3>
         <ul id="listaServicos">
@@ -24,17 +24,25 @@
         </ul>
       </aside>
 
-      <!-- Coluna Direita: Conteúdo -->
+      <!-- Content Area -->
       <section class="content-area">
         <button id="menuBtn" class="menu-btn" aria-label="Abrir menu">
           ☰
         </button>
         <div id="conteudoServico" role="tabpanel">
-          <!-- Módulo: Dashboard -->
-          <article id="view-dashboard">
-            <h2>Dashboard</h2>
-            <p>Bem-vindo ao sistema PetClin.</p>
-            <p>Selecione um módulo no menu ao lado.</p>
+          <article id="view-clinicas">
+            <div class="header-actions">
+              <h2>Clínicas Cadastradas</h2>
+              <button
+                class="btn btn-primary"
+                onclick="window.location.href = 'criar_clinica.html'"
+              >
+                Cadastrar Nova Clínica
+              </button>
+            </div>
+            <div id="clinicas-container" class="clinicas-container">
+              <!-- Cards das clínicas serão inseridos aqui via JS -->
+            </div>
           </article>
         </div>
       </section>
@@ -44,7 +52,7 @@
     <button id="logoutBtn" class="btn-btn-logout">Sair</button>
 
     <!-- JS -->
-    <script src="../JS/session-auth.js"></script>
-    <script src="../JS/home.js"></script>
+    <script src="../js/session-auth.js"></script>
+    <script src="../js/clinicas.js"></script>
   </body>
 </html>

@@ -1,13 +1,10 @@
 from flask import Blueprint, request, jsonify, session
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token
+from backend.config.database import get_connection
 
 auth_bp = Blueprint('auth_bp', __name__)
-
-def get_db_connection():
-    conn = sqlite3.connect('backend/database/petclin.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -17,7 +14,7 @@ def register():
     if not data or not data.get('email') or not data.get('senha') or not data.get('nome'):
         return jsonify({'error': 'Dados incompletos'}), 400
         
-    conn = get_db_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     
     # Verificar duplicidade
@@ -50,33 +47,40 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    
-    if not data or not data.get('email') or not data.get('senha'):
-        return jsonify({'error': 'Email e senha obrigatórios'}), 400
+    try:
+        data = request.get_json()
         
-    conn = get_db_connection()
-    user = conn.execute('SELECT * FROM usuarios WHERE email = ?', (data['email'],)).fetchone()
-    conn.close()
-    
-    if user and check_password_hash(user['senha'], data['senha']):
-        session.clear()
-        # Definindo a sessão conforme especificado no início do projeto
-        session['user_id'] = user['id']
-        session['user_nome'] = user['nome']
-        session['user_tipo'] = user['tipo']
-        session['clinica_id'] = user['clinica_id']
+        if not data or not data.get('email') or not data.get('senha'):
+            return jsonify({'error': 'Email e senha obrigatórios'}), 400
+            
+        conn = get_connection()
+        user = conn.execute('SELECT * FROM usuarios WHERE email = ?', (data['email'],)).fetchone()
+        conn.close()
         
-        return jsonify({
-            'message': 'Login realizado',
-            'user': {
-                'id': user['id'],
-                'nome': user['nome'],
-                'tipo': user['tipo']
-            }
-        })
-        
-    return jsonify({'error': 'Credenciais inválidas'}), 401
+        if user and check_password_hash(user['senha'], data['senha']):
+            session.clear()
+            # Definindo a sessão conforme especificado no início do projeto
+            session['user_id'] = user['id']
+            session['user_nome'] = user['nome']
+            session['user_tipo'] = user['tipo']
+            session['clinica_id'] = user['clinica_id']
+            
+            access_token = create_access_token(identity=user['id'])
+            
+            return jsonify({
+                'message': 'Login realizado',
+                'access_token': access_token,
+                'user': {
+                    'id': user['id'],
+                    'nome': user['nome'],
+                    'tipo': user['tipo']
+                }
+            })
+            
+        return jsonify({'error': 'Credenciais inválidas'}), 401
+    except Exception as e:
+        print(f"Erro no login: {e}") # Mostra o erro no terminal do servidor
+        return jsonify({'error': f'Erro interno: {str(e)}'}), 500
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

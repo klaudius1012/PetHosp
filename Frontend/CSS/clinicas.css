@@ -1,0 +1,100 @@
+/* c:/Users/Alessandra/Documents/PetClin/frontend/css/clinicas.css */
+
+.content-area .header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.content-area h2 {
+  margin: 0;
+}
+
+.clinicas-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.clinica-card {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.clinica-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #1a202c;
+  font-size: 1.25rem;
+}
+
+.clinica-card p {
+  margin: 0.25rem 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.clinica-card p strong {
+  color: #2d3748;
+}
+
+.card-actions {
+  margin-top: auto; /* Empurra para o final do card */
+  padding-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.card-actions .btn-edit {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.card-actions .btn-edit:hover {
+  background-color: #e2e8f0;
+}
+
+.card-actions .btn-delete {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.card-actions .btn-delete:hover {
+  background-color: #fecaca;
+}
+
+.empty-message,
+.error-message {
+  grid-column: 1 / -1; /* Ocupa todas as colunas */
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  color: #64748b;
+}

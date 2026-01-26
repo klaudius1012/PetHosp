@@ -34,14 +34,11 @@ def get_clinicas():
     """
     conn = get_db_connection()
     try:
-        # Exemplo de como obter o ID da clínica do usuário logado
-        clinica_id = get_clinica_id_from_token()
-
         # Para esta rota específica, listamos todas as clínicas, pois é uma
         # entidade de gerenciamento. Para outras rotas, você filtraria pelo clinica_id.
         # Exemplo de como seria em outra rota:
-        # tutores = conn.execute('SELECT * FROM tutores WHERE id_clinica = ?', (clinica_id,)).fetchall()
-        
+        # clinica_id = get_clinica_id_from_token()
+        # tutores = conn.execute('SELECT * FROM tutores WHERE clinica_id = ?', (clinica_id,)).fetchall()
         clinicas = conn.execute('SELECT * FROM clinicas').fetchall()
         return jsonify([dict(row) for row in clinicas]), 200
     except Exception as e:
@@ -137,29 +134,21 @@ def create_clinica():
     """
     conn = None
     try:
-        # 1. Obter o ID da clínica do usuário logado.
-        # Este passo é essencial para todas as rotas de criação de dados.
-        clinica_id_usuario = get_clinica_id_from_token()
-
         data = request.get_json()
         if not data:
             return jsonify({'error': 'Dados não fornecidos'}), 400
-        
+
         nome = data.get('nome')
         cnpj = data.get('cnpj')
         endereco = data.get('endereco')
         telefone = data.get('telefone')
-        
+
         if not nome:
             return jsonify({'error': 'O nome da clínica é obrigatório'}), 400
 
-        # 2. Adicionar o `id_clinica` no INSERT.
-        # O exemplo abaixo é para a tabela 'tutores'. Adapte para outras tabelas.
-        # sql_tutor = 'INSERT INTO tutores (nome, cpf, id_clinica) VALUES (?, ?, ?)'
-        # valores_tutor = (nome_tutor, cpf_tutor, clinica_id_usuario)
-
-        # Como esta rota cria a própria clínica, não inserimos o `clinica_id_usuario`.
-        # Apenas demonstramos o padrão.
+        # Para outras rotas (ex: criar tutor), o clinica_id do token seria usado no INSERT.
+        # Ex: clinica_id = get_clinica_id_from_token()
+        # conn.execute('INSERT INTO tutores (nome, clinica_id) VALUES (?, ?)', (nome_tutor, clinica_id))
         conn = get_db_connection()
         cursor = conn.execute(
             'INSERT INTO clinicas (nome, cnpj, endereco, telefone) VALUES (?, ?, ?, ?)',

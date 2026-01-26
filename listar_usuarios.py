@@ -9,8 +9,8 @@ def exportar_usuarios():
     # Caminho para o banco de dados
     db_path = os.path.join(base_dir, 'backend', 'database', 'petclin.db')
     
-    # Arquivo de saída solicitado
-    output_file = os.path.join(base_dir, 'pendendias.txt')
+    # Arquivo de saída para o relatório de usuários
+    output_file = os.path.join(base_dir, 'relatorio_usuarios.txt')
 
     print(f"Lendo banco de dados em: {db_path}")
 

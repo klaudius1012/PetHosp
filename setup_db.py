@@ -35,14 +35,22 @@ def init_db():
     # Verifica se já existe algum usuário administrador
     cursor.execute("SELECT count(*) FROM usuarios")
     if cursor.fetchone()[0] == 0:
-        print("Criando usuário administrador padrão...")
+        print("Criando usuários padrão...")
+        # Usuário Administrador da Clínica Padrão
         senha_hash = generate_password_hash("123456")
         cursor.execute("""
-            INSERT INTO usuarios (username, password_hash, clinica_id, role)
-            VALUES (?, ?, ?, ?)
-        """, ("admin@petclin.com", senha_hash, 1, "admin"))
-        print("Usuário administrador criado: admin@petclin.com")
-        print("Senha: 123456")
+            INSERT INTO usuarios (nome, email, senha, clinica_id, role)
+            VALUES (?, ?, ?, ?, ?)
+        """, ("Administrador", "admin@petclin.com", senha_hash, 1, "admin"))
+        print("- Usuário 'admin' criado: admin@petclin.com (senha: 123456)")
+
+        # Usuário Super Administrador (acesso total)
+        super_senha_hash = generate_password_hash("superadmin")
+        cursor.execute("""
+            INSERT INTO usuarios (nome, email, senha, clinica_id, role)
+            VALUES (?, ?, ?, ?, ?)
+        """, ("Super Admin", "superadmin@petclin.com", super_senha_hash, 1, "super-admin"))
+        print("- Usuário 'super-admin' criado: superadmin@petclin.com (senha: superadmin)")
 
     conn.commit()
     conn.close()

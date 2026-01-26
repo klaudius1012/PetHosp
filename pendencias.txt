@@ -1,0 +1,49 @@
+=================================================
+PENDÊNCIAS E STATUS - SISTEMA MULTI-CLÍNICA
+=================================================
+
+Este documento descreve o que já foi implementado para suportar múltiplas clínicas e o que ainda precisa ser feito para garantir que o sistema funcione corretamente nesse modelo.
+
+---------------------------------
+✅ O QUE JÁ FOI FEITO
+---------------------------------
+
+1.  **Estrutura do Banco de Dados:**
+    *   O banco de dados foi preparado com sucesso. Praticamente todas as tabelas (tutores, animais, atendimentos, produtos, etc.) já possuem a coluna `clinica_id`.
+    *   Isso significa que a base para associar cada registro a uma clínica específica já existe.
+
+2.  **Autenticação Inteligente (JWT):**
+    *   Quando um usuário faz login, o sistema gera um "token" de segurança (JWT).
+    *   Este token agora carrega duas informações cruciais: o `clinica_id` e o `role` (papel, ex: "admin" ou "super-admin") do usuário.
+
+3.  **Isolamento de Dados (Exemplo em Tutores):**
+    *   As rotas da API para gerenciar tutores (`/tutores`) já foram atualizadas para usar o `clinica_id` do token.
+    *   **Na prática:** Quando um usuário logado pede a lista de tutores, a API filtra e retorna apenas os tutores associados à sua clínica. O mesmo acontece ao criar, editar ou deletar um tutor, garantindo que um usuário da "Clínica A" não possa ver ou modificar dados da "Clínica B".
+
+---------------------------------
+🎯 O QUE PRECISA SER FEITO AGORA
+---------------------------------
+
+O padrão de isolamento de dados implementado em "Tutores" precisa ser replicado para TODAS as outras partes do sistema.
+
+1.  **Replicar o Padrão de `clinica_id` para Todas as Rotas:**
+    *   **Onde:** Em todos os arquivos de rotas dentro de `backend/routes/` (ex: `animais_routes.py`, `atendimentos_routes.py`, `produtos_routes.py`, `agendamentos_routes.py`, etc.).
+    *   **O que fazer:** Em cada rota (GET, POST, PUT, DELETE), obter o `clinica_id` do token e usá-lo nas consultas SQL, exatamente como foi feito em `tutores_routes.py`.
+        *   Para `INSERT`: Adicionar o `clinica_id` ao criar um novo registro.
+        *   Para `SELECT`, `UPDATE`, `DELETE`: Adicionar `WHERE clinica_id = ?` para filtrar os registros.
+
+2.  **Implementar a Visão do "Super-Admin":**
+    *   **Onde:** Nas rotas de listagem (GET) de todas as entidades (tutores, animais, etc.).
+    *   **O que fazer:** Adicionar uma verificação do `role` do usuário.
+        *   Se `role == 'super-admin'`, a consulta SQL **NÃO DEVE** ter o filtro `WHERE clinica_id = ?`, para que ele possa ver os dados de todas as clínicas.
+        *   Se o `role` for qualquer outro, o filtro `WHERE clinica_id = ?` é obrigatório.
+
+3.  **Restringir Gerenciamento de Clínicas:**
+    *   **Onde:** No arquivo `backend/routes/clinica_routes.py`.
+    *   **O que fazer:** Proteger as rotas de criação (`POST`), atualização (`PUT`) e exclusão (`DELETE`) de clínicas. Apenas usuários com `role == 'super-admin'` devem ter permissão para executar essas ações. Isso impede que um administrador normal crie ou apague clínicas.
+
+4.  **Ajustar Criação de Novos Usuários:**
+    *   **Onde:** Na rota de registro de usuários (provavelmente em `auth_routes.py`).
+    *   **O que fazer:** A lógica para criar novos usuários precisa ser mais inteligente.
+        *   Um `super-admin` deve poder criar um novo usuário e associá-lo a qualquer `clinica_id`.
+        *   Um `admin` de uma clínica só deve poder criar usuários para a sua própria clínica (o `clinica_id` do novo usuário deve ser o mesmo do `admin` que o está criando).
